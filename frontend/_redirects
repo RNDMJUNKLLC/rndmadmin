@@ -1,0 +1,12 @@
+# Redirect root to dashboard
+/  /dashboard.html  200
+
+# SPA fallback for dashboard routes
+/dashboard/*  /dashboard.html  200
+
+# Security redirects
+/admin  /dashboard.html  301
+/login  /dashboard.html  301
+
+# Prevent access to temp reference files
+/temp_reference/*  /dashboard.html  301
