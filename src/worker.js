@@ -1,6 +1,7 @@
 /**
  * RNDM Admin Dashboard - Cloudflare Worker
  * Serves static dashboard files with enhanced security and performance
+ * Updated: 2025-10-06 - Force redeploy with secure Firebase integration
  */
 
 // Security headers for enhanced protection
