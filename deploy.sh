@@ -21,21 +21,12 @@ fi
 # Deploy to Workers
 echo "📦 Deploying RNDM Admin Dashboard to Cloudflare Workers..."
 
-# Development deployment
-echo "🧪 Deploying to development environment..."
-wrangler deploy --env development
+# Production deployment (default environment)
+echo "🌍 Deploying to production environment..."
+wrangler deploy --env=""
 
-# Production deployment
-read -p "🚀 Deploy to production? (y/N): " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo "🌍 Deploying to production environment..."
-    wrangler deploy
-    echo "✅ Production deployment complete!"
-    echo "🔗 Your dashboard should be available at: https://admin.rndmjunk.com"
-else
-    echo "⚠️  Production deployment skipped"
-fi
+echo "✅ Production deployment complete!"
+echo "🔗 Your dashboard should be available at: https://admin.rndmjunk.com"
 
 echo ""
 echo "✅ Deployment process complete!"

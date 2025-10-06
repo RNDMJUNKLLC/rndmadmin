@@ -3,8 +3,6 @@
  * Serves static dashboard files with enhanced security and performance
  */
 
-import { getAssetFromKV, mapRequestToAsset } from '@cloudflare/kv-asset-handler';
-
 // Security headers for enhanced protection
 const SECURITY_HEADERS = {
   'X-Frame-Options': 'DENY',
@@ -52,62 +50,55 @@ export default {
       if (url.pathname.startsWith('/temp_reference/')) {
         return Response.redirect(`${url.origin}/dashboard.html`, 301);
       }
-      
-      // Custom request mapping for SPA behavior
-      const requestOptions = {
-        mapRequestToAsset: request => {
-          const url = new URL(request.url);
-          
-          // Handle dashboard routes (SPA fallback)
-          if (url.pathname.startsWith('/dashboard/') && !url.pathname.includes('.')) {
-            return mapRequestToAsset(new Request(`${url.origin}/dashboard.html`, request));
+
+      // Handle OPTIONS for CORS
+      if (request.method === 'OPTIONS') {
+        return new Response(null, {
+          status: 200,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+            ...SECURITY_HEADERS
           }
-          
-          return mapRequestToAsset(request);
-        }
-      };
-      
-      // Get asset from KV storage
-      const response = await getAssetFromKV(request, requestOptions);
-      
-      // Clone response to modify headers
-      const modifiedResponse = new Response(response.body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers
-      });
-      
-      // Add security headers
-      Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
-        modifiedResponse.headers.set(key, value);
-      });
-      
-      // Set cache headers based on content type
-      const contentType = modifiedResponse.headers.get('content-type') || '';
-      
-      for (const [type, cacheControl] of Object.entries(CACHE_SETTINGS)) {
-        if (contentType.includes(type)) {
-          modifiedResponse.headers.set('Cache-Control', cacheControl);
-          break;
-        }
+        });
       }
       
-      // Add CORS headers for API endpoints if needed
-      if (url.pathname.startsWith('/api/')) {
-        modifiedResponse.headers.set('Access-Control-Allow-Origin', '*');
-        modifiedResponse.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        modifiedResponse.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      // Try to get asset from the static site
+      const assetResponse = await env.ASSETS.fetch(request);
+      
+      // If asset exists, enhance with security headers
+      if (assetResponse.status !== 404) {
+        const modifiedResponse = new Response(assetResponse.body, {
+          status: assetResponse.status,
+          statusText: assetResponse.statusText,
+          headers: assetResponse.headers
+        });
+        
+        // Add security headers
+        Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+          modifiedResponse.headers.set(key, value);
+        });
+        
+        // Set cache headers based on content type
+        const contentType = modifiedResponse.headers.get('content-type') || '';
+        
+        for (const [type, cacheControl] of Object.entries(CACHE_SETTINGS)) {
+          if (contentType.includes(type)) {
+            modifiedResponse.headers.set('Cache-Control', cacheControl);
+            break;
+          }
+        }
+        
+        return modifiedResponse;
       }
       
-      return modifiedResponse;
-      
-    } catch (error) {
-      // Handle 404s by serving the dashboard (SPA fallback)
-      if (error.status === 404) {
-        try {
-          const dashboardRequest = new Request(`${new URL(request.url).origin}/dashboard.html`);
-          const dashboardResponse = await getAssetFromKV(dashboardRequest);
-          
+      // SPA fallback - serve dashboard.html for routes that don't exist
+      if (!url.pathname.includes('.') || url.pathname.startsWith('/dashboard/')) {
+        const dashboardRequest = new Request(`${url.origin}/dashboard.html`);
+        const dashboardResponse = await env.ASSETS.fetch(dashboardRequest);
+        
+        if (dashboardResponse.status !== 404) {
           const fallbackResponse = new Response(dashboardResponse.body, {
             status: 200, // Return 200 for SPA routing
             statusText: 'OK',
@@ -120,15 +111,19 @@ export default {
           });
           
           return fallbackResponse;
-        } catch (dashboardError) {
-          return new Response('Dashboard not found', { status: 404 });
         }
       }
       
-      // Handle other errors
+      // Return 404 with security headers
+      return new Response('Not Found', {
+        status: 404,
+        headers: SECURITY_HEADERS
+      });
+      
+    } catch (error) {
       console.error('Worker error:', error);
       return new Response(`Error: ${error.message}`, { 
-        status: error.status || 500,
+        status: 500,
         headers: SECURITY_HEADERS
       });
     }
