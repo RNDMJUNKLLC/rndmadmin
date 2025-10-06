@@ -22,6 +22,9 @@ import {
   orderByKey
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
+// Import Firebase configuration
+import { firebaseConfig, validateConfig } from './firebase-config.js';
+
 class FirebaseAdminService {
   constructor() {
     this.app = null;
@@ -36,20 +39,6 @@ class FirebaseAdminService {
     this.applicationsRef = null;
   }
 
-  // Get Firebase configuration from secure endpoint
-  async getFirebaseConfig() {
-    try {
-      const response = await fetch('/api/config/firebase');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error('Failed to get Firebase config:', error);
-      return null;
-    }
-  }
-
   // Initialize Firebase
   async initialize() {
     if (this.initialized) {
@@ -57,14 +46,11 @@ class FirebaseAdminService {
     }
 
     try {
-      const config = await this.getFirebaseConfig();
-      if (!config) {
-        console.warn('Firebase config not available - running in demo mode');
-        return false;
-      }
+      // Validate configuration
+      validateConfig();
 
       // Initialize Firebase
-      this.app = initializeApp(config);
+      this.app = initializeApp(firebaseConfig);
       this.database = getDatabase(this.app);
       this.auth = getAuth(this.app);
 
