@@ -30,10 +30,26 @@
                         <i class="fas fa-tachometer-alt"></i>
                         <span>Overview</span>
                     </div>
+                    <div class="menu-item" data-view="website">
+                        <i class="fas fa-globe"></i>
+                        <span>Website Management</span>
+                    </div>
                     <div class="menu-item" data-view="analytics">
                         <i class="fas fa-chart-line"></i>
                         <span>Analytics</span>
                     </div>
+                    <div class="menu-item" data-view="ads">
+                        <i class="fas fa-ad"></i>
+                        <span>Ads & AdSense</span>
+                    </div>
+                    <div class="menu-item" data-view="budget">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>Budget & Revenue</span>
+                    </div>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="section-title">Management</div>
                     <div class="menu-item" data-view="users">
                         <i class="fas fa-users"></i>
                         <span>Users</span>
@@ -230,12 +246,311 @@
                     </div>
                 </div>
                 
-                <!-- Other Views (placeholders for now) -->
-                <div class="view-container" id="analytics-view">
-                    <h2>Analytics Dashboard</h2>
-                    <p>Analytics and reporting features will be implemented here.</p>
+                <!-- Website Management View -->
+                <div class="view-container" id="website-view">
+                    <div class="page-header">
+                        <h2>Website Management</h2>
+                        <p>Manage contact form submissions, project inquiries, and website data</p>
+                    </div>
+                    
+                    <div class="website-stats-grid">
+                        <div class="stat-card" data-stat="total-submissions">
+                            <div class="stat-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>0</h3>
+                                <p>Total Submissions</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card" data-stat="pending-submissions">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>0</h3>
+                                <p>Pending Review</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card" data-stat="conversion-rate">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>0%</h3>
+                                <p>Conversion Rate</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card" data-stat="avg-project-value">
+                            <div class="stat-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>$0K</h3>
+                                <p>Avg Project Value</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="submissions-section">
+                        <div class="section-header">
+                            <h3>Recent Contact Submissions</h3>
+                            <div class="section-controls">
+                                <button class="btn btn-refresh" onclick="refreshSubmissions()">
+                                    <i class="fas fa-sync-alt"></i>
+                                    Refresh
+                                </button>
+                                <select id="submission-filter" onchange="filterSubmissions()">
+                                    <option value="all">All Submissions</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="in-progress">In Progress</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="submissions-table-container">
+                            <table class="data-table" id="submissions-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Client</th>
+                                        <th>Project Type</th>
+                                        <th>Budget</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="submissions-tbody">
+                                    <tr>
+                                        <td colspan="7" class="loading-row">Loading submissions...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 
+                <!-- Analytics View -->
+                <div class="view-container" id="analytics-view">
+                    <div class="page-header">
+                        <h2>Analytics Dashboard</h2>
+                        <p>Application metrics, user engagement, and performance analytics</p>
+                    </div>
+                    
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <h3>Submission Trends</h3>
+                            <div class="chart-container">
+                                <canvas id="submissions-trend-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="analytics-card">
+                            <h3>Project Type Distribution</h3>
+                            <div class="chart-container">
+                                <canvas id="project-type-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="analytics-card">
+                            <h3>Budget Distribution</h3>
+                            <div class="chart-container">
+                                <canvas id="budget-distribution-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="analytics-card">
+                            <h3>Conversion Funnel</h3>
+                            <div class="chart-container">
+                                <canvas id="conversion-funnel-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="analytics-card">
+                            <h3>Key Metrics</h3>
+                            <div class="engagement-metrics">
+                                <div class="metric" data-metric="total-leads">
+                                    <span class="metric-label">Total Leads</span>
+                                    <span class="metric-value">0</span>
+                                </div>
+                                <div class="metric" data-metric="conversion-rate">
+                                    <span class="metric-label">Conversion Rate</span>
+                                    <span class="metric-value">0%</span>
+                                </div>
+                                <div class="metric" data-metric="avg-response-time">
+                                    <span class="metric-label">Avg. Response Time</span>
+                                    <span class="metric-value">-</span>
+                                </div>
+                                <div class="metric" data-metric="monthly-growth">
+                                    <span class="metric-label">Monthly Growth</span>
+                                    <span class="metric-value">0%</span>
+                                </div>
+                                <div class="metric" data-metric="pipeline-value">
+                                    <span class="metric-label">Pipeline Value</span>
+                                    <span class="metric-value">$0</span>
+                                </div>
+                                <div class="metric" data-metric="closed-deals">
+                                    <span class="metric-label">Closed Deals</span>
+                                    <span class="metric-value">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ads & AdSense View -->
+                <div class="view-container" id="ads-view">
+                    <div class="page-header">
+                        <h2>Ads & AdSense Analytics</h2>
+                        <p>Google Ads spending and AdSense revenue tracking</p>
+                    </div>
+                    
+                    <div class="ads-overview">
+                        <div class="ads-card google-ads">
+                            <div class="card-header">
+                                <h3><i class=\"fab fa-google\"></i> Google Ads</h3>
+                                <button class="btn btn-sync" onclick="syncGoogleAds()">
+                                    <i class="fas fa-sync"></i> Sync Data
+                                </button>
+                            </div>
+                            <div class="ads-metrics">
+                                <div class="metric-row">
+                                    <div class="metric">
+                                        <span class="label">Total Spend (30d)</span>
+                                        <span class="value" id="ads-spend">$0.00</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="label">Impressions</span>
+                                        <span class="value" id="ads-impressions">0</span>
+                                    </div>
+                                </div>
+                                <div class="metric-row">
+                                    <div class="metric">
+                                        <span class="label">Clicks</span>
+                                        <span class="value" id="ads-clicks">0</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="label">CTR</span>
+                                        <span class="value" id="ads-ctr">0.00%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="ads-card adsense">
+                            <div class="card-header">
+                                <h3><i class=\"fas fa-dollar-sign\"></i> AdSense Revenue</h3>
+                                <button class="btn btn-sync" onclick="syncAdSense()">
+                                    <i class="fas fa-sync"></i> Sync Data
+                                </button>
+                            </div>
+                            <div class="ads-metrics">
+                                <div class="metric-row">
+                                    <div class="metric">
+                                        <span class="label">Revenue (30d)</span>
+                                        <span class="value" id="adsense-revenue">$0.00</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="label">Page Views</span>
+                                        <span class="value" id="adsense-views">0</span>
+                                    </div>
+                                </div>
+                                <div class="metric-row">
+                                    <div class="metric">
+                                        <span class="label">RPM</span>
+                                        <span class="value" id="adsense-rpm">$0.00</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="label">CTR</span>
+                                        <span class="value" id="adsense-ctr">0.00%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ads-setup-notice">
+                        <div class="notice-card">
+                            <h4>⚡ Setup Required</h4>
+                            <p>To display real Google Ads and AdSense data, you'll need to:</p>
+                            <ul>
+                                <li>Connect your Google Ads account via API</li>
+                                <li>Link your AdSense account</li>
+                                <li>Configure authentication credentials</li>
+                            </ul>
+                            <button class="btn btn-primary" onclick="showAdsSetup()">
+                                Setup Integration
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Budget & Revenue View -->
+                <div class="view-container" id="budget-view">
+                    <div class="page-header">
+                        <h2>Budget & Revenue Tracking</h2>
+                        <p>Monitor spending vs income across all revenue streams</p>
+                    </div>
+                    
+                    <div class="budget-summary">
+                        <div class="summary-card" id="total-revenue">
+                            <h3>Total Revenue</h3>
+                            <div class="summary-amount positive">$0</div>
+                            <div class="summary-period">All Time</div>
+                        </div>
+                        
+                        <div class="summary-card" id="total-expenses">
+                            <h3>Total Expenses</h3>
+                            <div class="summary-amount negative">$0</div>
+                            <div class="summary-period">All Time</div>
+                        </div>
+                        
+                        <div class="summary-card" id="net-profit">
+                            <h3>Net Profit</h3>
+                            <div class="summary-amount">$0</div>
+                            <div class="summary-period">All Time</div>
+                        </div>
+                        
+                        <div class="summary-card" id="profit-margin">
+                            <h3>Profit Margin</h3>
+                            <div class="summary-amount">0%</div>
+                            <div class="summary-period">Percentage</div>
+                        </div>
+                    </div>
+                    
+                    <div class="budget-breakdown">
+                        <div class="breakdown-section">
+                            <h3>Revenue Sources</h3>
+                            <div id="revenue-breakdown">
+                                <!-- Revenue items will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div class="breakdown-section">
+                            <h3>Expenses</h3>
+                            <div id="expense-breakdown">
+                                <!-- Expense items will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="budget-actions">
+                        <button class="btn-primary" id="add-income-btn">
+                            <i class="fas fa-plus"></i> Add Income
+                        </button>
+                        <button class="btn-secondary" id="add-expense-btn">
+                            <i class="fas fa-minus"></i> Add Expense
+                        </button>
+                        <button class="btn-export" id="export-budget-btn">
+                            <i class="fas fa-download"></i> Export Report
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Other Views -->
                 <div class="view-container" id="users-view">
                     <h2>User Management</h2>
                     <p>User management interface will be implemented here.</p>
@@ -272,6 +587,16 @@
     <!-- Mobile Overlay -->
     <div class="mobile-overlay" id="mobileOverlay"></div>
     
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- Firebase Admin Service -->
+    <script src="js/firebase-admin.js"></script>
+    
+    <!-- Dashboard Modules -->
+    <script src="js/website-management.js"></script>
+    <script src="js/analytics-dashboard.js"></script>
+    <script src="js/budget-management.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
 </html>
