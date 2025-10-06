@@ -10,12 +10,27 @@
     "frontend:dev": "live-server frontend --port=3001",
     "install:all": "npm install && cd backend && npm install"
   },
-  "keywords": ["admin", "dashboard", "rndm", "management"],
+  "keywords": [
+    "admin",
+    "dashboard",
+    "rndm",
+    "management"
+  ],
   "author": "RNDM LLC",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2",
     "live-server": "^1.2.2",
     "nodemon": "^3.0.2"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.0",
+    "morgan": "^1.10.1"
   }
 }
