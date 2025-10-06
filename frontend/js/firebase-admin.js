@@ -1,30 +1,20 @@
-// Firebase imports
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+/**
+ * Firebase Admin Service
+ * Handles all Firebase operations for the admin dashboard
+ */
 
-import {
-  getDatabase,
-  ref,
-  push,
-  set,
-  get,
-  update,
-  remove,
-  query,
-  orderByChild,
-  limitToLast,
-  child,
-  orderByKey
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+// Firebase SDK imports from CDN
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getDatabase, ref, push, set, get, update, remove, query, orderByChild, limitToLast, child, orderByKey } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 // Import Firebase configuration
-import { firebaseConfig, validateConfig } from './firebase-config.js';
+import { firebaseConfig } from './firebase-config.js';
 
+/**
+ * Firebase Admin Service Class
+ * Singleton pattern for Firebase operations
+ */
 class FirebaseAdminService {
   constructor() {
     this.app = null;
@@ -32,24 +22,28 @@ class FirebaseAdminService {
     this.auth = null;
     this.initialized = false;
     
-    // References will be set after initialization
+    // Database references
     this.contactFormsRef = null;
     this.usersRef = null;
     this.supportTicketsRef = null;
     this.applicationsRef = null;
+    
+    // Auto-initialize on construction
+    this.initialize();
   }
 
-  // Initialize Firebase
+  /**
+   * Initialize Firebase app and services
+   */
   async initialize() {
     if (this.initialized) {
       return true;
     }
 
     try {
-      // Validate configuration
-      validateConfig();
-
-      // Initialize Firebase
+      console.log('Initializing Firebase...');
+      
+      // Initialize Firebase app
       this.app = initializeApp(firebaseConfig);
       this.database = getDatabase(this.app);
       this.auth = getAuth(this.app);
@@ -61,18 +55,28 @@ class FirebaseAdminService {
       this.applicationsRef = ref(this.database, 'applications');
 
       this.initialized = true;
-      console.log('Firebase initialized successfully');
+      console.log('✅ Firebase initialized successfully');
       return true;
     } catch (error) {
-      console.error('Firebase initialization failed:', error);
+      console.error('❌ Firebase initialization failed:', error);
+      this.initialized = false;
       return false;
     }
   }
 
-  // Sign in admin user
+  /**
+   * Check if Firebase is ready
+   */
+  isReady() {
+    return this.initialized;
+  }
+
+  /**
+   * Sign in admin user
+   */
   async signInAdmin(email, password) {
-    if (!await this.initialize()) {
-      return { success: false, message: 'Firebase not available - running in demo mode' };
+    if (!this.initialized) {
+      return { success: false, message: 'Firebase not initialized' };
     }
     
     try {
@@ -84,14 +88,30 @@ class FirebaseAdminService {
     }
   }
 
-  // Get contact form submissions
+  /**
+   * Sign out current user
+   */
+  async signOutAdmin() {
+    if (!this.initialized) return;
+    
+    try {
+      await signOut(this.auth);
+      return { success: true };
+    } catch (error) {
+      console.error('Sign out error:', error);
+      return { success: false, message: error.message };
+    }
+  }
+
+  /**
+   * Get contact form submissions
+   */
   async getContactSubmissions(limit = 100) {
-    if (!await this.initialize()) {
-      return { success: true, submissions: [] }; // Return empty array in demo mode
+    if (!this.initialized) {
+      return { success: true, submissions: [] };
     }
     
     try {
-      // Query contact forms with optional limit
       const contactQuery = query(
         this.contactFormsRef,
         orderByChild('timestamp'),
@@ -102,8 +122,6 @@ class FirebaseAdminService {
       
       if (snapshot.exists()) {
         const data = snapshot.val();
-        
-        // Convert to array and add IDs
         const submissions = Object.keys(data).map(key => ({
           id: key,
           ...data[key]
@@ -113,19 +131,21 @@ class FirebaseAdminService {
         submissions.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
         
         return { success: true, submissions };
-      } else {
-        return { success: true, submissions: [] };
       }
+      
+      return { success: true, submissions: [] };
     } catch (error) {
       console.error('Error getting contact submissions:', error);
       return { success: false, message: error.message };
     }
   }
 
-  // Update contact form submission
+  /**
+   * Update contact form submission
+   */
   async updateContactSubmission(submissionId, updatedData) {
-    if (!await this.initialize()) {
-      return { success: false, message: 'Firebase not available - running in demo mode' };
+    if (!this.initialized) {
+      return { success: false, message: 'Firebase not initialized' };
     }
     
     try {
@@ -141,10 +161,12 @@ class FirebaseAdminService {
     }
   }
 
-  // Delete contact form submission
+  /**
+   * Delete contact form submission
+   */
   async deleteContactSubmission(submissionId) {
-    if (!await this.initialize()) {
-      return { success: false, message: 'Firebase not available - running in demo mode' };
+    if (!this.initialized) {
+      return { success: false, message: 'Firebase not initialized' };
     }
     
     try {
@@ -157,10 +179,12 @@ class FirebaseAdminService {
     }
   }
 
-  // Get all users
+  /**
+   * Get all users
+   */
   async getAllUsers(limit = 100) {
-    if (!await this.initialize()) {
-      return { success: true, users: [] }; // Return empty in demo mode
+    if (!this.initialized) {
+      return { success: true, users: [] };
     }
     
     try {
@@ -181,10 +205,12 @@ class FirebaseAdminService {
     }
   }
 
-  // Get support tickets
+  /**
+   * Get support tickets
+   */
   async getSupportTickets(limit = 50) {
-    if (!await this.initialize()) {
-      return { success: true, tickets: [] }; // Return empty in demo mode
+    if (!this.initialized) {
+      return { success: true, tickets: [] };
     }
     
     try {
@@ -205,10 +231,12 @@ class FirebaseAdminService {
     }
   }
 
-  // Get applications (job applications)
+  /**
+   * Get applications
+   */
   async getApplications(limit = 50) {
-    if (!await this.initialize()) {
-      return { success: true, applications: [] }; // Return empty in demo mode
+    if (!this.initialized) {
+      return { success: true, applications: [] };
     }
     
     try {
@@ -229,10 +257,11 @@ class FirebaseAdminService {
     }
   }
 
-  // Get analytics data
+  /**
+   * Get analytics data
+   */
   async getAnalytics() {
-    if (!await this.initialize()) {
-      // Return demo analytics data
+    if (!this.initialized) {
       return {
         success: true,
         analytics: {
@@ -254,7 +283,7 @@ class FirebaseAdminService {
       const users = usersResult.users || [];
       const tickets = ticketsResult.tickets || [];
 
-      // Calculate analytics
+      // Calculate time ranges
       const now = Date.now();
       const today = new Date().setHours(0, 0, 0, 0);
       const thisWeek = now - (7 * 24 * 60 * 60 * 1000);
@@ -290,7 +319,9 @@ class FirebaseAdminService {
     }
   }
 
-  // Utility function to group by field
+  /**
+   * Utility: Group array by field
+   */
   groupBy(array, field) {
     return array.reduce((acc, item) => {
       const key = item[field] || 'unknown';
@@ -299,9 +330,11 @@ class FirebaseAdminService {
     }, {});
   }
 
-  // Get revenue estimates from project submissions
+  /**
+   * Get revenue estimates
+   */
   async getRevenueEstimates() {
-    if (!await this.initialize()) {
+    if (!this.initialized) {
       return { success: true, estimates: { totalEstimated: 0, byMonth: {}, byType: {}, potentialRevenue: [] } };
     }
     
@@ -311,12 +344,12 @@ class FirebaseAdminService {
 
       const submissions = result.submissions;
       const budgetRanges = {
-        '10-50': 30,      // Average of range
+        '10-50': 30,
         '50-100': 75,
         '100-200': 150,
         '200-300': 250,
-        '300+': 400,      // Conservative estimate
-        'flexible': 200   // Average estimate
+        '300+': 400,
+        'flexible': 200
       };
 
       const estimates = {
@@ -345,5 +378,8 @@ class FirebaseAdminService {
 }
 
 // Create and export singleton instance
-export const firebaseAdmin = new FirebaseAdminService();
-export { FirebaseAdminService };
+const firebaseAdmin = new FirebaseAdminService();
+
+// Export both the instance and class
+export { firebaseAdmin, FirebaseAdminService };
+export default firebaseAdmin;
