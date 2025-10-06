@@ -16,8 +16,17 @@ zone_name = "rndmjunk.com"
 # Environment variables
 [vars]
 ENVIRONMENT = "production"
-# Firebase credentials are set as SECRETS in Cloudflare Workers dashboard
-# Under Settings > Variables and Secrets
+
+# Firebase configuration - these will be overridden by Cloudflare Environment Variables
+[vars]
+FIREBASE_API_KEY = "placeholder"
+FIREBASE_AUTH_DOMAIN = "placeholder"
+FIREBASE_DATABASE_URL = "placeholder"  
+FIREBASE_PROJECT_ID = "placeholder"
+FIREBASE_STORAGE_BUCKET = "placeholder"
+FIREBASE_MESSAGING_SENDER_ID = "placeholder"
+FIREBASE_APP_ID = "placeholder"
+FIREBASE_MEASUREMENT_ID = "placeholder"
 
 # Development configuration
 [env.development]
