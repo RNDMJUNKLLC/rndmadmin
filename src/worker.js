@@ -107,6 +107,32 @@ export default {
 
       // Handle Firebase config API endpoint
       if (url.pathname === '/api/config/firebase') {
+        // Check if we have the required environment variables/secrets
+        const hasConfig = env.FIREBASE_API_KEY && env.FIREBASE_PROJECT_ID;
+        
+        if (!hasConfig) {
+          console.log('Firebase secrets not available:', {
+            hasApiKey: !!env.FIREBASE_API_KEY,
+            hasProjectId: !!env.FIREBASE_PROJECT_ID,
+            envKeys: Object.keys(env)
+          });
+          
+          return new Response(JSON.stringify({ 
+            error: 'Firebase configuration not available',
+            debug: {
+              hasApiKey: !!env.FIREBASE_API_KEY,
+              hasProjectId: !!env.FIREBASE_PROJECT_ID,
+              availableKeys: Object.keys(env).filter(k => k.startsWith('FIREBASE'))
+            }
+          }), {
+            status: 503,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            }
+          });
+        }
+        
         const firebaseConfig = {
           apiKey: env.FIREBASE_API_KEY,
           authDomain: env.FIREBASE_AUTH_DOMAIN,
@@ -122,8 +148,7 @@ export default {
           status: 200,
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            ...SECURITY_HEADERS
+            'Access-Control-Allow-Origin': '*'
           }
         });
       }
