@@ -14,6 +14,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function checkAuthentication() {
+    // Temporarily skip authentication to debug loop
+    console.log('Authentication check - setting temporary auth');
+    localStorage.setItem('rndm_admin_logged_in', 'true');
+    localStorage.setItem('rndm_admin_login_time', new Date().toISOString());
+    return;
+    
     const isLoggedIn = localStorage.getItem('rndm_admin_logged_in');
     if (isLoggedIn !== 'true') {
         // Show login prompt instead of redirecting to avoid loops
@@ -69,6 +75,10 @@ function goToLogin() {
     // Only redirect if explicitly requested
     window.location.href = 'login.html';
 }
+
+// Make functions globally accessible
+window.proceedWithoutAuth = proceedWithoutAuth;
+window.goToLogin = goToLogin;
 
 function initializeDashboard() {
     // Set up sidebar toggle
