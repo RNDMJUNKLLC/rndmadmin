@@ -16,17 +16,19 @@ zone_name = "rndmjunk.com"
 # Environment variables
 [vars]
 ENVIRONMENT = "production"
+# Production environment variables (set these in Cloudflare dashboard)
+# These are placeholders - DO NOT set real values here
+# Set actual values in Cloudflare Workers dashboard under Settings > Variables
+FIREBASE_API_KEY = ""
+FIREBASE_AUTH_DOMAIN = ""
+FIREBASE_DATABASE_URL = ""
+FIREBASE_PROJECT_ID = ""
+FIREBASE_STORAGE_BUCKET = ""
+FIREBASE_MESSAGING_SENDER_ID = ""
+FIREBASE_APP_ID = ""
+FIREBASE_MEASUREMENT_ID = ""
 
 # Development configuration
 [env.development]
 name = "rndmadmin-dev"
 vars = { ENVIRONMENT = "development" }
-
-# Production environment variables (set these in Cloudflare dashboard)
-# FIREBASE_API_KEY
-# FIREBASE_AUTH_DOMAIN  
-# FIREBASE_DATABASE_URL
-# FIREBASE_PROJECT_ID
-# FIREBASE_STORAGE_BUCKET
-# FIREBASE_MESSAGING_SENDER_ID
-# FIREBASE_APP_ID

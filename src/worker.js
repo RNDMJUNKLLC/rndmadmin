@@ -86,6 +86,29 @@ export default {
         });
       }
 
+      // Handle Firebase config API endpoint
+      if (url.pathname === '/api/config/firebase') {
+        const firebaseConfig = {
+          apiKey: env.FIREBASE_API_KEY,
+          authDomain: env.FIREBASE_AUTH_DOMAIN,
+          databaseURL: env.FIREBASE_DATABASE_URL,
+          projectId: env.FIREBASE_PROJECT_ID,
+          storageBucket: env.FIREBASE_STORAGE_BUCKET,
+          messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID,
+          appId: env.FIREBASE_APP_ID,
+          measurementId: env.FIREBASE_MEASUREMENT_ID
+        };
+        
+        return new Response(JSON.stringify(firebaseConfig), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            ...SECURITY_HEADERS
+          }
+        });
+      }
+
       // Handle OPTIONS for CORS
       if (request.method === 'OPTIONS') {
         return new Response(null, {

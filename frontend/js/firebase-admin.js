@@ -1,120 +1,152 @@
-// Firebase configuration and integration for RNDM Admin Dashboard
+// Firebase imports
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { 
-  getDatabase, 
-  ref, 
-  onValue, 
-  push, 
-  update, 
-  remove, 
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+import {
+  getDatabase,
+  ref,
+  push,
+  set,
   get,
+  update,
+  remove,
   query,
   orderByChild,
   limitToLast,
-  startAt,
-  endAt
+  child,
+  orderByKey
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-import { 
-  getAuth, 
-  signInWithEmailAndPassword,
-  onAuthStateChanged 
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-
-// Firebase configuration from the reference repository
-const firebaseConfig = {
-  apiKey: "AIzaSyA7Y2ppKIFumXd5aa7Lwj-263p-p1jiK7M",
-  authDomain: "rndmform-56a7b.firebaseapp.com",
-  databaseURL: "https://rndmform-56a7b-default-rtdb.firebaseio.com",
-  projectId: "rndmform-56a7b",
-  storageBucket: "rndmform-56a7b.appspot.com",
-  messagingSenderId: "592358469137",
-  appId: "1:592358469137:web:b2d18e70a70c4c42958bb0",
-  measurementId: "G-FB38H9S3QC"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-const auth = getAuth(app);
 
 class FirebaseAdminService {
   constructor() {
-    this.database = database;
-    this.auth = auth;
-    this.currentUser = null;
+    this.app = null;
+    this.database = null;
+    this.auth = null;
+    this.initialized = false;
     
-    // Database references
-    this.contactFormsRef = ref(database, 'contact-forms');
-    this.usersRef = ref(database, 'users');
-    this.supportTicketsRef = ref(database, 'support-tickets');
-    this.applicationsRef = ref(database, 'applications');
-    
-    // Listen for auth changes
-    onAuthStateChanged(auth, (user) => {
-      this.currentUser = user;
-    });
+    // References will be set after initialization
+    this.contactFormsRef = null;
+    this.usersRef = null;
+    this.supportTicketsRef = null;
+    this.applicationsRef = null;
   }
 
-  // Authentication for admin
-  async signInAdmin(email, password) {
+  // Get Firebase configuration from secure endpoint
+  async getFirebaseConfig() {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const response = await fetch('/api/config/firebase');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to get Firebase config:', error);
+      return null;
+    }
+  }
+
+  // Initialize Firebase
+  async initialize() {
+    if (this.initialized) {
+      return true;
+    }
+
+    try {
+      const config = await this.getFirebaseConfig();
+      if (!config) {
+        console.warn('Firebase config not available - running in demo mode');
+        return false;
+      }
+
+      // Initialize Firebase
+      this.app = initializeApp(config);
+      this.database = getDatabase(this.app);
+      this.auth = getAuth(this.app);
+
+      // Set up database references
+      this.contactFormsRef = ref(this.database, 'contact-forms');
+      this.usersRef = ref(this.database, 'users');
+      this.supportTicketsRef = ref(this.database, 'support-tickets');
+      this.applicationsRef = ref(this.database, 'applications');
+
+      this.initialized = true;
+      console.log('Firebase initialized successfully');
+      return true;
+    } catch (error) {
+      console.error('Firebase initialization failed:', error);
+      return false;
+    }
+  }
+
+  // Sign in admin user
+  async signInAdmin(email, password) {
+    if (!await this.initialize()) {
+      return { success: false, message: 'Firebase not available - running in demo mode' };
+    }
+    
+    try {
+      const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
       return { success: true, user: userCredential.user };
     } catch (error) {
-      console.error('Admin sign in error:', error);
+      console.error('Sign in error:', error);
       return { success: false, message: error.message };
     }
   }
 
-  // Get all contact form submissions
+  // Get contact form submissions
   async getContactSubmissions(limit = 100) {
+    if (!await this.initialize()) {
+      return { success: true, submissions: [] }; // Return empty array in demo mode
+    }
+    
     try {
-      const snapshot = await get(query(this.contactFormsRef, limitToLast(limit)));
+      // Query contact forms with optional limit
+      const contactQuery = query(
+        this.contactFormsRef,
+        orderByChild('timestamp'),
+        limitToLast(limit)
+      );
+      
+      const snapshot = await get(contactQuery);
+      
       if (snapshot.exists()) {
         const data = snapshot.val();
+        
+        // Convert to array and add IDs
         const submissions = Object.keys(data).map(key => ({
           id: key,
-          ...data[key],
-          dateSubmitted: data[key].dateSubmitted || new Date(data[key].timestamp).toISOString()
-        })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+          ...data[key]
+        }));
+        
+        // Sort by timestamp (newest first)
+        submissions.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
         
         return { success: true, submissions };
+      } else {
+        return { success: true, submissions: [] };
       }
-      return { success: true, submissions: [] };
     } catch (error) {
-      console.error('Error getting submissions:', error);
+      console.error('Error getting contact submissions:', error);
       return { success: false, message: error.message };
     }
   }
 
-  // Listen to contact submissions in real-time
-  onContactSubmissionsChange(callback, limit = 100) {
-    const submissionsQuery = query(this.contactFormsRef, limitToLast(limit));
-    
-    return onValue(submissionsQuery, (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        const submissions = Object.keys(data).map(key => ({
-          id: key,
-          ...data[key],
-          dateSubmitted: data[key].dateSubmitted || new Date(data[key].timestamp).toISOString()
-        })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-        
-        callback({ success: true, submissions });
-      } else {
-        callback({ success: true, submissions: [] });
-      }
-    });
-  }
-
-  // Update contact submission
+  // Update contact form submission
   async updateContactSubmission(submissionId, updatedData) {
+    if (!await this.initialize()) {
+      return { success: false, message: 'Firebase not available - running in demo mode' };
+    }
+    
     try {
-      const submissionRef = ref(database, `contact-forms/${submissionId}`);
+      const submissionRef = ref(this.database, `contact-forms/${submissionId}`);
       await update(submissionRef, {
         ...updatedData,
-        lastModified: Date.now(),
-        lastModifiedDate: new Date().toISOString()
+        lastModified: Date.now()
       });
       return { success: true };
     } catch (error) {
@@ -123,10 +155,14 @@ class FirebaseAdminService {
     }
   }
 
-  // Delete contact submission
+  // Delete contact form submission
   async deleteContactSubmission(submissionId) {
+    if (!await this.initialize()) {
+      return { success: false, message: 'Firebase not available - running in demo mode' };
+    }
+    
     try {
-      const submissionRef = ref(database, `contact-forms/${submissionId}`);
+      const submissionRef = ref(this.database, `contact-forms/${submissionId}`);
       await remove(submissionRef);
       return { success: true };
     } catch (error) {
@@ -137,6 +173,10 @@ class FirebaseAdminService {
 
   // Get all users
   async getAllUsers(limit = 100) {
+    if (!await this.initialize()) {
+      return { success: true, users: [] }; // Return empty in demo mode
+    }
+    
     try {
       const snapshot = await get(query(this.usersRef, limitToLast(limit)));
       if (snapshot.exists()) {
@@ -157,6 +197,10 @@ class FirebaseAdminService {
 
   // Get support tickets
   async getSupportTickets(limit = 50) {
+    if (!await this.initialize()) {
+      return { success: true, tickets: [] }; // Return empty in demo mode
+    }
+    
     try {
       const snapshot = await get(query(this.supportTicketsRef, limitToLast(limit)));
       if (snapshot.exists()) {
@@ -177,6 +221,10 @@ class FirebaseAdminService {
 
   // Get applications (job applications)
   async getApplications(limit = 50) {
+    if (!await this.initialize()) {
+      return { success: true, applications: [] }; // Return empty in demo mode
+    }
+    
     try {
       const snapshot = await get(query(this.applicationsRef, limitToLast(limit)));
       if (snapshot.exists()) {
@@ -197,6 +245,18 @@ class FirebaseAdminService {
 
   // Get analytics data
   async getAnalytics() {
+    if (!await this.initialize()) {
+      // Return demo analytics data
+      return {
+        success: true,
+        analytics: {
+          submissions: { total: 0, today: 0, week: 0, month: 0, byType: {}, byBudget: {}, byTimeline: {}, byPriority: {} },
+          users: { total: 0, week: 0, month: 0 },
+          tickets: { total: 0, open: 0, week: 0 }
+        }
+      };
+    }
+    
     try {
       const [submissionsResult, usersResult, ticketsResult] = await Promise.all([
         this.getContactSubmissions(1000),
@@ -255,6 +315,10 @@ class FirebaseAdminService {
 
   // Get revenue estimates from project submissions
   async getRevenueEstimates() {
+    if (!await this.initialize()) {
+      return { success: true, estimates: { totalEstimated: 0, byMonth: {}, byType: {}, potentialRevenue: [] } };
+    }
+    
     try {
       const result = await this.getContactSubmissions(1000);
       if (!result.success) return result;
