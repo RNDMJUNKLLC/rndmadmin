@@ -36,19 +36,54 @@ export default {
     try {
       const url = new URL(request.url);
       
-      // Handle root path - redirect to dashboard
+      // Handle root path - serve dashboard directly (no redirect)
       if (url.pathname === '/') {
-        return Response.redirect(`${url.origin}/dashboard.html`, 301);
+        const dashboardRequest = new Request(`${url.origin}/dashboard.html`);
+        const dashboardResponse = await env.ASSETS.fetch(dashboardRequest);
+        
+        if (dashboardResponse.status !== 404) {
+          const response = new Response(dashboardResponse.body, {
+            status: 200,
+            statusText: 'OK',
+            headers: dashboardResponse.headers
+          });
+          
+          // Add security headers
+          Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+            response.headers.set(key, value);
+          });
+          
+          return response;
+        }
       }
       
-      // Handle admin and login redirects
+      // Handle admin and login paths - serve dashboard directly
       if (url.pathname === '/admin' || url.pathname === '/login') {
-        return Response.redirect(`${url.origin}/dashboard.html`, 301);
+        const dashboardRequest = new Request(`${url.origin}/dashboard.html`);
+        const dashboardResponse = await env.ASSETS.fetch(dashboardRequest);
+        
+        if (dashboardResponse.status !== 404) {
+          const response = new Response(dashboardResponse.body, {
+            status: 200,
+            statusText: 'OK',
+            headers: dashboardResponse.headers
+          });
+          
+          // Add security headers
+          Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+            response.headers.set(key, value);
+          });
+          
+          return response;
+        }
       }
       
-      // Block access to temp_reference files
+      // Block access to temp_reference files - return 404
       if (url.pathname.startsWith('/temp_reference/')) {
-        return Response.redirect(`${url.origin}/dashboard.html`, 301);
+        return new Response('Not Found', { 
+          status: 404,
+          headers: SECURITY_HEADERS
+        });
       }
 
       // Handle OPTIONS for CORS

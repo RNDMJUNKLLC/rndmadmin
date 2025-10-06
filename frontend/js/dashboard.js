@@ -16,7 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
 function checkAuthentication() {
     const isLoggedIn = localStorage.getItem('rndm_admin_logged_in');
     if (isLoggedIn !== 'true') {
-        window.location.href = 'login.html';
+        // Show login prompt instead of redirecting to avoid loops
+        console.warn('User not authenticated - showing login prompt');
+        showLoginPrompt();
         return;
     }
     
@@ -32,6 +34,40 @@ function checkAuthentication() {
             return;
         }
     }
+}
+
+function showLoginPrompt() {
+    // Create a simple in-page login prompt to avoid redirect loops
+    const loginPrompt = document.createElement('div');
+    loginPrompt.id = 'login-prompt';
+    loginPrompt.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+            <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 400px; text-align: center;">
+                <h2>Admin Access Required</h2>
+                <p>Please authenticate to access the admin dashboard.</p>
+                <button onclick="proceedWithoutAuth()" style="background: #3b82f6; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin: 8px;">
+                    Continue Anyway (Demo Mode)
+                </button>
+                <button onclick="goToLogin()" style="background: #6b7280; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin: 8px;">
+                    Go to Login
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(loginPrompt);
+}
+
+function proceedWithoutAuth() {
+    // Set temporary auth for demo purposes
+    localStorage.setItem('rndm_admin_logged_in', 'true');
+    localStorage.setItem('rndm_admin_login_time', new Date().toISOString());
+    document.getElementById('login-prompt')?.remove();
+    location.reload();
+}
+
+function goToLogin() {
+    // Only redirect if explicitly requested
+    window.location.href = 'login.html';
 }
 
 function initializeDashboard() {
@@ -508,9 +544,9 @@ function logout() {
     // Show logout message
     showNotification('Logging out...', 'info');
     
-    // Redirect to login page
+    // Show login prompt instead of redirecting
     setTimeout(() => {
-        window.location.href = 'login.html';
+        showLoginPrompt();
     }, 1000);
 }
 
