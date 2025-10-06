@@ -1,0 +1,21 @@
+{
+  "name": "rndmadmin",
+  "version": "1.0.0",
+  "description": "RNDM Admin Dashboard - A comprehensive admin interface for data management",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "backend:dev": "nodemon backend/server.js",
+    "frontend:dev": "live-server frontend --port=3001",
+    "install:all": "npm install && cd backend && npm install"
+  },
+  "keywords": ["admin", "dashboard", "rndm", "management"],
+  "author": "RNDM LLC",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "live-server": "^1.2.2",
+    "nodemon": "^3.0.2"
+  }
+}

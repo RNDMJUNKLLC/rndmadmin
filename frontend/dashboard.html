@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNDM Admin Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-random"></i>
+                    <span class="logo-text">RNDM Admin</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-item active" data-view="overview">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Overview</span>
+                    </div>
+                    <div class="menu-item" data-view="analytics">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </div>
+                    <div class="menu-item" data-view="users">
+                        <i class="fas fa-users"></i>
+                        <span>Users</span>
+                    </div>
+                    <div class="menu-item" data-view="content">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Content</span>
+                    </div>
+                    <div class="menu-item" data-view="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </div>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="section-title">Tools</div>
+                    <div class="menu-item" data-view="logs">
+                        <i class="fas fa-list-alt"></i>
+                        <span>System Logs</span>
+                    </div>
+                    <div class="menu-item" data-view="database">
+                        <i class="fas fa-database"></i>
+                        <span>Database</span>
+                    </div>
+                    <div class="menu-item" data-view="api">
+                        <i class="fas fa-code"></i>
+                        <span>API Monitor</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">Admin User</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </nav>
+        
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title" id="pageTitle">Overview</h1>
+                </div>
+                
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="header-btn" title="Notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">3</span>
+                        </button>
+                        <button class="header-btn" title="Search">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <button class="header-btn" title="Settings">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="user-menu">
+                        <div class="user-avatar-small">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Content Views -->
+            <div class="content-area">
+                <!-- Overview View -->
+                <div class="view-container active" id="overview-view">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>1,247</h3>
+                                <p>Total Users</p>
+                                <span class="stat-change positive">+12%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>$24,580</h3>
+                                <p>Revenue</p>
+                                <span class="stat-change positive">+8.2%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>892</h3>
+                                <p>Orders</p>
+                                <span class="stat-change negative">-3.1%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>99.9%</h3>
+                                <p>Uptime</p>
+                                <span class="stat-change neutral">+0.1%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>Recent Activity</h3>
+                                <button class="card-action">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <p>New user registered</p>
+                                        <span class="activity-time">2 minutes ago</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <p>Order #1247 completed</p>
+                                        <span class="activity-time">15 minutes ago</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-cog"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <p>System settings updated</p>
+                                        <span class="activity-time">1 hour ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>Quick Actions</h3>
+                            </div>
+                            <div class="quick-actions">
+                                <button class="quick-action-btn">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Add User</span>
+                                </button>
+                                <button class="quick-action-btn">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span>Create Post</span>
+                                </button>
+                                <button class="quick-action-btn">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>Send Email</span>
+                                </button>
+                                <button class="quick-action-btn">
+                                    <i class="fas fa-download"></i>
+                                    <span>Export Data</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Other Views (placeholders for now) -->
+                <div class="view-container" id="analytics-view">
+                    <h2>Analytics Dashboard</h2>
+                    <p>Analytics and reporting features will be implemented here.</p>
+                </div>
+                
+                <div class="view-container" id="users-view">
+                    <h2>User Management</h2>
+                    <p>User management interface will be implemented here.</p>
+                </div>
+                
+                <div class="view-container" id="content-view">
+                    <h2>Content Management</h2>
+                    <p>Content management system will be implemented here.</p>
+                </div>
+                
+                <div class="view-container" id="settings-view">
+                    <h2>Settings</h2>
+                    <p>Application settings will be implemented here.</p>
+                </div>
+                
+                <div class="view-container" id="logs-view">
+                    <h2>System Logs</h2>
+                    <p>System logs and monitoring will be implemented here.</p>
+                </div>
+                
+                <div class="view-container" id="database-view">
+                    <h2>Database Management</h2>
+                    <p>Database administration tools will be implemented here.</p>
+                </div>
+                
+                <div class="view-container" id="api-view">
+                    <h2>API Monitor</h2>
+                    <p>API monitoring and testing tools will be implemented here.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
