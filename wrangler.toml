@@ -7,6 +7,11 @@ compatibility_flags = ["nodejs_compat"]
 [site]
 bucket = "./frontend"
 
+# Custom domain routes
+[[routes]]
+pattern = "admin.rndmjunk.com/*"
+zone_name = "rndmjunk.com"
+
 # Environment variables
 [vars]
 ENVIRONMENT = "production"

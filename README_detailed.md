@@ -95,8 +95,8 @@ The dashboard integrates with a Firebase Realtime Database containing:
    ```javascript
    const firebaseConfig = {
      apiKey: "your-api-key",
-     authDomain: "your-project.firebaseapp.com",
-     databaseURL: "https://your-project.firebaseio.com",
+     authDomain: "rndmform-56a7b.firebaseapp.com",
+     databaseURL: "https://rndmform-56a7b-default-rtdb.firebaseio.com",
      projectId: "your-project-id",
      // ... other config
    };
@@ -148,6 +148,8 @@ The dashboard integrates with a Firebase Realtime Database containing:
 
 ## Usage
 
+**Production URL**: https://admin.rndmjunk.com
+
 1. **Dashboard Overview**: Monitor key metrics and recent activity
 2. **Website Management**: Review and manage contact form submissions
 3. **Analytics**: Analyze trends, conversions, and performance data  
@@ -173,7 +175,7 @@ wrangler pages publish frontend --project-name=rndm-admin-dashboard
 
 1. Upload the `frontend/` directory to Cloudflare Pages
 2. Set index.html as the entry point
-3. Configure custom domain if needed
+3. Custom domain: admin.rndmjunk.com (configured)
 
 ### Environment Variables
 

@@ -32,7 +32,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "🌍 Deploying to production environment..."
     wrangler deploy
     echo "✅ Production deployment complete!"
-    echo "🔗 Your dashboard should be available at: https://rndmadmin.your-subdomain.workers.dev"
+    echo "🔗 Your dashboard should be available at: https://admin.rndmjunk.com"
 else
     echo "⚠️  Production deployment skipped"
 fi
@@ -50,9 +50,10 @@ echo "   - FIREBASE_STORAGE_BUCKET"
 echo "   - FIREBASE_MESSAGING_SENDER_ID"
 echo "   - FIREBASE_APP_ID"
 echo ""
-echo "2. Configure custom domain (optional):"
-echo "   wrangler route list"
-echo "   wrangler route add 'admin.yourdomain.com/*' rndmadmin"
+echo "2. Custom domain configuration:"
+echo "   Domain: admin.rndmjunk.com (configured in wrangler.toml)"
+echo "   Verify route: wrangler route list"
+echo "   DNS: Point admin.rndmjunk.com to your worker"
 echo ""
 echo "3. Monitor your deployment:"
 echo "   wrangler tail"

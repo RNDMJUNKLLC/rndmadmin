@@ -343,7 +343,7 @@ router.get('/settings', authenticateToken, (req, res) => {
     const settings = {
         general: {
             site_name: 'RNDM Admin',
-            site_url: 'https://admin.rndm.com',
+            site_url: 'https://admin.rndmjunk.com',
             timezone: 'UTC',
             date_format: 'YYYY-MM-DD',
             time_format: '24h'
