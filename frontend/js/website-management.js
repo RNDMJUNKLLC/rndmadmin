@@ -35,18 +35,14 @@ class WebsiteManager {
             });
         }
 
-        // Real-time updates
-        this.firebaseAdmin.onSubmissionsUpdate((submissions) => {
-            this.submissions = submissions;
-            this.renderSubmissions();
-            this.updateStats();
-        });
+        // Real-time updates removed - would need Firebase onValue listeners
     }
 
     async loadSubmissions() {
         try {
             this.showLoading();
-            this.submissions = await this.firebaseAdmin.getAllSubmissions();
+            const result = await this.firebaseAdmin.getContactSubmissions();
+            this.submissions = result.submissions || [];
             this.renderSubmissions();
             this.updateStats();
         } catch (error) {

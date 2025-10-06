@@ -22,7 +22,8 @@ class AnalyticsManager {
 
     async loadData() {
         try {
-            this.submissions = await this.firebaseAdmin.getAllSubmissions();
+            const result = await this.firebaseAdmin.getContactSubmissions();
+            this.submissions = result.submissions || [];
         } catch (error) {
             console.error('Error loading analytics data:', error);
             this.submissions = [];
@@ -366,11 +367,13 @@ class AnalyticsManager {
     }
 
     setupRealTimeUpdates() {
-        this.firebaseAdmin.onSubmissionsUpdate(async (submissions) => {
-            this.submissions = submissions;
+        // Real-time updates would require Firebase onValue listeners
+        // For now, using periodic polling
+        setInterval(async () => {
+            await this.loadData();
             this.updateCharts();
             this.updateEngagementMetrics();
-        });
+        }, 30000); // Update every 30 seconds
     }
 
     updateCharts() {

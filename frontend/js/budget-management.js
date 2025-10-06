@@ -43,7 +43,8 @@ class BudgetManager {
     async loadFinancialData() {
         try {
             // Load submissions to calculate project revenue
-            const submissions = await this.firebaseAdmin.getAllSubmissions();
+            const result = await this.firebaseAdmin.getContactSubmissions();
+            const submissions = result.submissions || [];
             this.calculateProjectRevenue(submissions);
             
             // In a real app, you'd load expenses from a separate collection
