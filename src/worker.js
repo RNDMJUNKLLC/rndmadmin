@@ -43,9 +43,9 @@ const SECURITY_HEADERS = {
 
 // Cache settings for different file types
 const CACHE_SETTINGS = {
-  'text/html': 'public, max-age=0, must-revalidate',
-  'application/javascript': 'public, max-age=31536000, immutable',
-  'text/css': 'public, max-age=31536000, immutable',
+  'text/html': 'no-cache, no-store, must-revalidate',
+  'application/javascript': 'no-cache, no-store, must-revalidate',
+  'text/css': 'no-cache, no-store, must-revalidate',
   'image/': 'public, max-age=31536000, immutable',
   'font/': 'public, max-age=31536000, immutable'
 };
