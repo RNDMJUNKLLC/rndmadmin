@@ -3,11 +3,11 @@
  * Handles financial tracking, income/expense management, and revenue analytics
  */
 
-import { FirebaseAdminService } from './firebase-admin.js';
+import { firebaseAdmin } from './firebase-admin.js';
 
 class BudgetManager {
     constructor() {
-        this.firebaseAdmin = new FirebaseAdminService();
+        this.firebaseAdmin = firebaseAdmin;
         this.expenses = [];
         this.revenue = [];
         this.init();

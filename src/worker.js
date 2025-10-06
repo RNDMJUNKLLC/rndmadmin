@@ -11,15 +11,31 @@ const SECURITY_HEADERS = {
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-  // Temporarily relaxed CSP to fix loading issues
   'Content-Security-Policy': `
-    default-src 'self' 'unsafe-inline' 'unsafe-eval';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:;
-    style-src 'self' 'unsafe-inline' https: data:;
-    font-src 'self' https: data:;
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' 
+      https://cdn.jsdelivr.net 
+      https://www.gstatic.com 
+      https://apis.google.com 
+      https://static.cloudflareinsights.com 
+      https://*.firebaseio.com 
+      https://*.googleapis.com;
+    style-src 'self' 'unsafe-inline' 
+      https://fonts.googleapis.com 
+      https://cdnjs.cloudflare.com;
+    font-src 'self' 
+      https://fonts.gstatic.com 
+      https://cdnjs.cloudflare.com;
     img-src 'self' data: https: blob:;
-    connect-src 'self' https: wss: data:;
-    frame-src 'self' https:;
+    connect-src 'self' 
+      https://*.firebaseio.com 
+      https://*.googleapis.com 
+      https://api.googleads.com 
+      https://www.googleadservices.com 
+      wss://*.firebaseio.com;
+    frame-src 'self' 
+      https://*.firebaseapp.com 
+      https://accounts.google.com;
     object-src 'none';
   `.replace(/\s+/g, ' ').trim()
 };

@@ -3,11 +3,11 @@
  * Handles contact form submissions, client data, and website analytics
  */
 
-import { FirebaseAdminService } from './firebase-admin.js';
+import { firebaseAdmin } from './firebase-admin.js';
 
 class WebsiteManager {
     constructor() {
-        this.firebaseAdmin = new FirebaseAdminService();
+        this.firebaseAdmin = firebaseAdmin;
         this.submissions = [];
         this.currentFilter = 'all';
         this.init();

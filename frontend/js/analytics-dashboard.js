@@ -3,11 +3,11 @@
  * Handles data visualization and metrics for the admin dashboard
  */
 
-import { FirebaseAdminService } from './firebase-admin.js';
+import { firebaseAdmin } from './firebase-admin.js';
 
 class AnalyticsManager {
     constructor() {
-        this.firebaseAdmin = new FirebaseAdminService();
+        this.firebaseAdmin = firebaseAdmin;
         this.charts = {};
         this.submissions = [];
         this.init();
