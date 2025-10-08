@@ -3,7 +3,7 @@
  * Handles contact form submissions, client data, and website analytics
  */
 
-import { firebaseAdmin } from './firebase-admin.js';
+import { firebaseAdmin } from './firebase-rest.js';
 
 class WebsiteManager {
     constructor() {

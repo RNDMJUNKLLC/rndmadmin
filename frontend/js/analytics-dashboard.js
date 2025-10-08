@@ -1,9 +1,9 @@
 /**
  * Analytics Dashboard Module
- * Handles data visualization and metrics for the admin dashboard
+ * Comprehensive analytics and data visualization for the admin dashboard
  */
 
-import { firebaseAdmin } from './firebase-admin.js';
+import { firebaseAdmin } from './firebase-rest.js';
 
 class AnalyticsManager {
     constructor() {
