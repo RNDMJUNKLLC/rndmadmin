@@ -514,6 +514,124 @@ class FirebaseRestService {
   }
 
   /**
+   * Get Google Ads data
+   */
+  async getGoogleAdsData() {
+    try {
+      const url = this.buildURL('google-ads-data');
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return { success: true, data: data || {} };
+    } catch (error) {
+      console.error('Error getting Google Ads data:', error);
+      return { success: false, message: error.message, data: {} };
+    }
+  }
+
+  /**
+   * Save Google Ads data
+   */
+  async saveGoogleAdsData(adsData) {
+    try {
+      const url = this.buildURL('google-ads-data');
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(adsData)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Error saving Google Ads data:', error);
+      return { success: false, message: error.message };
+    }
+  }
+
+  /**
+   * Get AdSense data
+   */
+  async getAdSenseData() {
+    try {
+      const url = this.buildURL('adsense-data');
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return { success: true, data: data || {} };
+    } catch (error) {
+      console.error('Error getting AdSense data:', error);
+      return { success: false, message: error.message, data: {} };
+    }
+  }
+
+  /**
+   * Save AdSense data
+   */
+  async saveAdSenseData(adsenseData) {
+    try {
+      const url = this.buildURL('adsense-data');
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(adsenseData)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Error saving AdSense data:', error);
+      return { success: false, message: error.message };
+    }
+  }
+
+  /**
+   * Save ads configuration
+   */
+  async saveAdsConfig(config) {
+    try {
+      const url = this.buildURL('ads-config');
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...config,
+          updatedAt: Date.now()
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Error saving ads config:', error);
+      return { success: false, message: error.message };
+    }
+  }
+
+  /**
    * Sign in admin user (placeholder - would need Firebase Auth REST API)
    */
   async signInAdmin(email, password) {

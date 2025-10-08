@@ -1644,3 +1644,226 @@ body {
     border-radius: 12px;
     border: 1px solid #e5e7eb;
 }
+
+/* Ads Manager Styles */
+.setup-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0;
+}
+
+.setup-tabs .tab-btn {
+    padding: 12px 24px;
+    border: none;
+    background: none;
+    color: #6b7280;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+}
+
+.setup-tabs .tab-btn:hover {
+    color: #1f2937;
+    background: #f9fafb;
+}
+
+.setup-tabs .tab-btn.active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s;
+}
+
+.setup-section {
+    padding: 20px 0;
+}
+
+.setup-section h4 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.setup-section h5 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.help-text {
+    color: #6b7280;
+    margin-bottom: 24px;
+    font-size: 14px;
+}
+
+.info-box {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    padding: 16px;
+    border-radius: 8px;
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.info-box i {
+    color: #3b82f6;
+    font-size: 20px;
+    margin-top: 2px;
+}
+
+.info-box strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #1e40af;
+}
+
+.info-box p {
+    margin: 0;
+    color: #1e40af;
+    font-size: 14px;
+}
+
+.info-box a {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.info-box a:hover {
+    color: #1d4ed8;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 4px;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+/* Ads view styles */
+.ads-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.ads-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+}
+
+.ads-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.ads-card h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-sync {
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-sync:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.ads-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.metric-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.metric .label {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.metric .value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.ads-setup-notice {
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.notice-card h4 {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #92400e;
+}
+
+.notice-card p {
+    margin: 0 0 12px 0;
+    color: #92400e;
+}
+
+.notice-card ul {
+    margin: 0 0 20px 20px;
+    color: #92400e;
+}
+
+.notice-card ul li {
+    margin-bottom: 8px;
+}
