@@ -29,6 +29,8 @@ class FirebaseRestService {
 
   /**
    * Build Firebase REST API URL
+   * Note: Requires Firebase Database Rules to allow public read access
+   * Or add ?auth=<database_secret> for authenticated access
    */
   buildURL(path) {
     return `${this.databaseURL}/${path}.json`;
