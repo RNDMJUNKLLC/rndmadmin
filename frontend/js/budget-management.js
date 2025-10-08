@@ -42,99 +42,19 @@ class BudgetManager {
 
     async loadFinancialData() {
         try {
-            // Load submissions to calculate project revenue
-            const result = await this.firebaseAdmin.getContactSubmissions();
-            const submissions = result.submissions || [];
-            this.calculateProjectRevenue(submissions);
+            // Load revenue and expenses from Firebase
+            const revenueResult = await this.firebaseAdmin.getRevenue();
+            const expensesResult = await this.firebaseAdmin.getExpenses();
             
-            // In a real app, you'd load expenses from a separate collection
-            // For now, we'll use sample data
-            this.loadSampleData();
+            this.revenue = revenueResult.revenue || [];
+            this.expenses = expensesResult.expenses || [];
+            
         } catch (error) {
             console.error('Error loading financial data:', error);
-            this.loadSampleData();
+            // Start with empty data so user can add their own
+            this.revenue = [];
+            this.expenses = [];
         }
-    }
-
-    calculateProjectRevenue(submissions) {
-        // Calculate revenue from completed projects
-        const completedProjects = submissions.filter(s => s.status === 'completed');
-        
-        const budgetValues = {
-            'under-5k': 2500,
-            '5k-15k': 10000,
-            '15k-50k': 32500,
-            '50k-100k': 75000,
-            'over-100k': 150000
-        };
-
-        this.revenue = completedProjects.map(project => ({
-            id: project.id,
-            source: 'Project Revenue',
-            description: `${project.businessName || 'Client'} - ${project.projectType || 'Project'}`,
-            amount: budgetValues[project.budget] || 0,
-            date: project.timestamp,
-            type: 'project'
-        }));
-
-        // Add sample AdSense revenue
-        this.addSampleAdSenseRevenue();
-    }
-
-    addSampleAdSenseRevenue() {
-        // Add sample monthly AdSense revenue
-        const currentMonth = new Date();
-        for (let i = 0; i < 6; i++) {
-            const date = new Date(currentMonth);
-            date.setMonth(date.getMonth() - i);
-            
-            this.revenue.push({
-                id: `adsense-${i}`,
-                source: 'Google AdSense',
-                description: `AdSense Revenue - ${date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`,
-                amount: Math.floor(Math.random() * 500) + 100, // Random between $100-$600
-                date: date.toISOString(),
-                type: 'adsense'
-            });
-        }
-    }
-
-    loadSampleData() {
-        // Sample expenses data
-        this.expenses = [
-            {
-                id: 'exp-1',
-                category: 'Google Ads',
-                description: 'Search Campaign - December',
-                amount: 850,
-                date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-                type: 'advertising'
-            },
-            {
-                id: 'exp-2',
-                category: 'Software & Tools',
-                description: 'VS Code Pro License',
-                amount: 199,
-                date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-                type: 'tools'
-            },
-            {
-                id: 'exp-3',
-                category: 'Hosting & Infrastructure',
-                description: 'Cloudflare Pro Plan',
-                amount: 20,
-                date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-                type: 'hosting'
-            },
-            {
-                id: 'exp-4',
-                category: 'Marketing',
-                description: 'Social Media Ads',
-                amount: 300,
-                date: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
-                type: 'marketing'
-            }
-        ];
     }
 
     updateBudgetSummary() {
@@ -344,40 +264,58 @@ class BudgetManager {
         return modal;
     }
 
-    addIncomeEntry(modal) {
-        const formData = {
-            id: `income-${Date.now()}`,
-            source: modal.querySelector('#income-source').value,
-            description: modal.querySelector('#income-description').value,
-            amount: parseFloat(modal.querySelector('#income-amount').value),
-            date: modal.querySelector('#income-date').value + 'T00:00:00.000Z',
-            type: 'manual'
-        };
+    async addIncomeEntry(modal) {
+        try {
+            const formData = {
+                source: modal.querySelector('#income-source').value,
+                description: modal.querySelector('#income-description').value,
+                amount: parseFloat(modal.querySelector('#income-amount').value),
+                date: new Date(modal.querySelector('#income-date').value).getTime(),
+                type: 'manual'
+            };
 
-        this.revenue.push(formData);
-        this.updateBudgetSummary();
-        this.updateBreakdowns();
-        
-        modal.remove();
-        this.showNotification('Income entry added successfully', 'success');
+            const result = await this.firebaseAdmin.createRevenue(formData);
+            
+            if (result.success) {
+                await this.loadFinancialData();
+                this.updateBudgetSummary();
+                this.updateBreakdowns();
+                modal.remove();
+                this.showNotification('Income entry added successfully', 'success');
+            } else {
+                this.showNotification('Failed to add income entry', 'error');
+            }
+        } catch (error) {
+            console.error('Error adding income:', error);
+            this.showNotification('Error adding income entry', 'error');
+        }
     }
 
-    addExpenseEntry(modal) {
-        const formData = {
-            id: `expense-${Date.now()}`,
-            category: modal.querySelector('#expense-category').value,
-            description: modal.querySelector('#expense-description').value,
-            amount: parseFloat(modal.querySelector('#expense-amount').value),
-            date: modal.querySelector('#expense-date').value + 'T00:00:00.000Z',
-            type: 'manual'
-        };
+    async addExpenseEntry(modal) {
+        try {
+            const formData = {
+                category: modal.querySelector('#expense-category').value,
+                description: modal.querySelector('#expense-description').value,
+                amount: parseFloat(modal.querySelector('#expense-amount').value),
+                date: new Date(modal.querySelector('#expense-date').value).getTime(),
+                type: 'manual'
+            };
 
-        this.expenses.push(formData);
-        this.updateBudgetSummary();
-        this.updateBreakdowns();
-        
-        modal.remove();
-        this.showNotification('Expense entry added successfully', 'success');
+            const result = await this.firebaseAdmin.createExpense(formData);
+            
+            if (result.success) {
+                await this.loadFinancialData();
+                this.updateBudgetSummary();
+                this.updateBreakdowns();
+                modal.remove();
+                this.showNotification('Expense entry added successfully', 'success');
+            } else {
+                this.showNotification('Failed to add expense entry', 'error');
+            }
+        } catch (error) {
+            console.error('Error adding expense:', error);
+            this.showNotification('Error adding expense entry', 'error');
+        }
     }
 
     exportBudgetReport() {

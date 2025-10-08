@@ -317,6 +317,124 @@ class FirebaseRestService {
   }
 
   /**
+   * Get expenses
+   */
+  async getExpenses(limit = 100) {
+    try {
+      const url = this.buildURL('expenses');
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data) {
+        return { success: true, expenses: [] };
+      }
+      
+      const expenses = Object.keys(data).map(key => ({
+        id: key,
+        ...data[key]
+      })).sort((a, b) => (b.date || 0) - (a.date || 0));
+      
+      return { success: true, expenses: expenses.slice(0, limit) };
+    } catch (error) {
+      console.error('Error getting expenses:', error);
+      return { success: false, message: error.message, expenses: [] };
+    }
+  }
+
+  /**
+   * Create expense
+   */
+  async createExpense(expenseData) {
+    try {
+      const url = this.buildURL('expenses');
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...expenseData,
+          createdAt: Date.now()
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return { success: true, expenseId: data.name };
+    } catch (error) {
+      console.error('Error creating expense:', error);
+      return { success: false, message: error.message };
+    }
+  }
+
+  /**
+   * Create revenue entry
+   */
+  async createRevenue(revenueData) {
+    try {
+      const url = this.buildURL('revenue');
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...revenueData,
+          createdAt: Date.now()
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return { success: true, revenueId: data.name };
+    } catch (error) {
+      console.error('Error creating revenue:', error);
+      return { success: false, message: error.message };
+    }
+  }
+
+  /**
+   * Get revenue entries
+   */
+  async getRevenue(limit = 100) {
+    try {
+      const url = this.buildURL('revenue');
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data) {
+        return { success: true, revenue: [] };
+      }
+      
+      const revenue = Object.keys(data).map(key => ({
+        id: key,
+        ...data[key]
+      })).sort((a, b) => (b.date || 0) - (a.date || 0));
+      
+      return { success: true, revenue: revenue.slice(0, limit) };
+    } catch (error) {
+      console.error('Error getting revenue:', error);
+      return { success: false, message: error.message, revenue: [] };
+    }
+  }
+
+  /**
    * Create new user
    */
   async createUser(userData) {

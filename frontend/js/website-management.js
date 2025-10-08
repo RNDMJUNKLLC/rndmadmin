@@ -240,7 +240,7 @@ class WebsiteManager {
                 lastModified: new Date().toISOString()
             };
 
-            await this.firebaseAdmin.updateSubmission(submissionId, formData);
+            await this.firebaseAdmin.updateContactSubmission(submissionId, formData);
             modal.remove();
             this.showSuccess('Submission updated successfully');
             this.loadSubmissions(); // Refresh the list
@@ -256,7 +256,7 @@ class WebsiteManager {
         }
 
         try {
-            await this.firebaseAdmin.deleteSubmission(submissionId);
+            await this.firebaseAdmin.deleteContactSubmission(submissionId);
             this.showSuccess('Submission deleted successfully');
             this.loadSubmissions(); // Refresh the list
         } catch (error) {
