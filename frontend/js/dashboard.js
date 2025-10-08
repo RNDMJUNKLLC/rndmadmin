@@ -18,15 +18,14 @@ function checkAuthentication() {
     console.log('Authentication check - setting temporary auth');
     localStorage.setItem('rndm_admin_logged_in', 'true');
     localStorage.setItem('rndm_admin_login_time', new Date().toISOString());
-    return;
     
-    const isLoggedIn = localStorage.getItem('rndm_admin_logged_in');
-    if (isLoggedIn !== 'true') {
-        // Show login prompt instead of redirecting to avoid loops
-        console.warn('User not authenticated - showing login prompt');
-        showLoginPrompt();
-        return;
-    }
+    // TODO: Implement proper authentication
+    // const isLoggedIn = localStorage.getItem('rndm_admin_logged_in');
+    // if (isLoggedIn !== 'true') {
+    //     console.warn('User not authenticated - showing login prompt');
+    //     showLoginPrompt();
+    //     return;
+    // }
     
     // Check session expiry
     const loginTime = localStorage.getItem('rndm_admin_login_time');
@@ -569,41 +568,5 @@ function logout() {
     }, 1000);
 }
 
-// API Client instance for dashboard
-const dashboardApi = new (class extends ApiClient {
-    async getDashboardStats() {
-        return this.get('/dashboard/stats');
-    }
-    
-    async getRecentActivity() {
-        return this.get('/dashboard/activity');
-    }
-    
-    async getUsers(page = 1, limit = 10) {
-        return this.get(`/users?page=${page}&limit=${limit}`);
-    }
-    
-    async createUser(userData) {
-        return this.post('/users', userData);
-    }
-    
-    async updateUser(userId, userData) {
-        return this.put(`/users/${userId}`, userData);
-    }
-    
-    async deleteUser(userId) {
-        return this.delete(`/users/${userId}`);
-    }
-    
-    async getSystemLogs(level = 'all') {
-        return this.get(`/logs?level=${level}`);
-    }
-    
-    async getApiStatus() {
-        return this.get('/status');
-    }
-})();
-
-// Export for use in other scripts
-window.dashboardApi = dashboardApi;
+// Export functions for use in other scripts
 window.logout = logout;
