@@ -181,6 +181,15 @@ function switchView(viewName) {
     
     // Load view-specific data
     loadViewData(viewName);
+    
+    // Load management module views
+    if (viewName === 'users' && window.managementModule) {
+        window.managementModule.loadUsers();
+    } else if (viewName === 'content' && window.managementModule) {
+        window.managementModule.loadContent();
+    } else if (viewName === 'settings' && window.managementModule) {
+        window.managementModule.loadSettings();
+    }
 }
 
 function loadDashboardData() {

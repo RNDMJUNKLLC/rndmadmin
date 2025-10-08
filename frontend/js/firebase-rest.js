@@ -317,6 +317,85 @@ class FirebaseRestService {
   }
 
   /**
+   * Create new user
+   */
+  async createUser(userData) {
+    try {
+      const url = this.buildURL('users');
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...userData,
+          dateJoined: userData.dateJoined || Date.now(),
+          status: userData.status || 'active'
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return { success: true, userId: data.name };
+    } catch (error) {
+      console.error('Error creating user:', error);
+      return { success: false, message: error.message };
+    }
+  }
+
+  /**
+   * Update user
+   */
+  async updateUser(userId, updatedData) {
+    try {
+      const url = this.buildURL(`users/${userId}`);
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...updatedData,
+          lastModified: Date.now()
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating user:', error);
+      return { success: false, message: error.message };
+    }
+  }
+
+  /**
+   * Delete user
+   */
+  async deleteUser(userId) {
+    try {
+      const url = this.buildURL(`users/${userId}`);
+      const response = await fetch(url, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      return { success: false, message: error.message };
+    }
+  }
+
+  /**
    * Sign in admin user (placeholder - would need Firebase Auth REST API)
    */
   async signInAdmin(email, password) {
