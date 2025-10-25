@@ -167,7 +167,11 @@ function switchView(viewName) {
     const pageTitle = document.getElementById('pageTitle');
     const titles = {
         'overview': 'Overview',
+        'website': 'Website Management',
         'analytics': 'Analytics',
+        'ads': 'Ads & AdSense',
+        'budget': 'Budget & Revenue',
+        'projects': 'Projects',
         'users': 'Users',
         'content': 'Content',
         'settings': 'Settings',

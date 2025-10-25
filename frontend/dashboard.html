@@ -46,6 +46,10 @@
                         <i class="fas fa-dollar-sign"></i>
                         <span>Budget & Revenue</span>
                     </div>
+                    <div class="menu-item" data-view="projects">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Projects</span>
+                    </div>
                 </div>
                 
                 <div class="menu-section">
@@ -513,6 +517,216 @@
                     </div>
                 </div>
                 
+                <!-- Projects View -->
+                <div class="view-container" id="projects-view">
+                    <div class="page-header">
+                        <h2>Projects Management</h2>
+                        <p>Track and manage all your projects in one place</p>
+                        <button class="btn btn-primary" id="add-project-btn">
+                            <i class="fas fa-plus"></i> Add Project
+                        </button>
+                    </div>
+                    
+                    <div class="projects-stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-project-diagram"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-projects">0</h3>
+                                <p>Total Projects</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="active-projects">0</h3>
+                                <p>Active Projects</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="completed-projects">0</h3>
+                                <p>Completed Projects</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="overdue-projects">0</h3>
+                                <p>Overdue Projects</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="projects-filters">
+                        <div class="filter-group">
+                            <select id="project-status-filter" onchange="filterProjects()">
+                                <option value="all">All Status</option>
+                                <option value="planning">Planning</option>
+                                <option value="active">Active</option>
+                                <option value="paused">Paused</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                            
+                            <select id="project-priority-filter" onchange="filterProjects()">
+                                <option value="all">All Priority</option>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                            
+                            <input type="text" id="project-search" placeholder="Search projects..." onkeyup="searchProjects()">
+                        </div>
+                        
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="grid" onclick="toggleProjectView('grid')">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="view-btn" data-view="list" onclick="toggleProjectView('list')">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="projects-container">
+                        <div class="projects-grid" id="projects-grid">
+                            <!-- Projects will be populated here -->
+                            <div class="empty-state" id="empty-projects-state">
+                                <div class="empty-icon">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <h3>No Projects Yet</h3>
+                                <p>Start by adding your first project to track progress and manage tasks.</p>
+                                <button class="btn btn-primary" onclick="showAddProjectModal()">
+                                    <i class="fas fa-plus"></i> Add First Project
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="projects-list" id="projects-list" style="display: none;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Status</th>
+                                        <th>Priority</th>
+                                        <th>Progress</th>
+                                        <th>Due Date</th>
+                                        <th>Budget</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="projects-table-body">
+                                    <!-- Table rows will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Project Modal -->
+                <div class="modal" id="project-modal">
+                    <div class="modal-content project-modal-content">
+                        <div class="modal-header">
+                            <h3 id="project-modal-title">Add New Project</h3>
+                            <button class="modal-close" onclick="closeProjectModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <form id="project-form" class="project-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="project-name">Project Name *</label>
+                                    <input type="text" id="project-name" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="project-client">Client</label>
+                                    <input type="text" id="project-client">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="project-status">Status</label>
+                                    <select id="project-status">
+                                        <option value="planning">Planning</option>
+                                        <option value="active" selected>Active</option>
+                                        <option value="paused">Paused</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="project-priority">Priority</label>
+                                    <select id="project-priority">
+                                        <option value="low">Low</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="critical">Critical</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="project-start-date">Start Date</label>
+                                    <input type="date" id="project-start-date">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="project-due-date">Due Date</label>
+                                    <input type="date" id="project-due-date">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="project-budget">Budget ($)</label>
+                                    <input type="number" id="project-budget" min="0" step="0.01">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="project-progress">Progress (%)</label>
+                                    <input type="number" id="project-progress" min="0" max="100" value="0">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="project-description">Description</label>
+                                <textarea id="project-description" rows="4"></textarea>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="project-tags">Tags (comma-separated)</label>
+                                <input type="text" id="project-tags" placeholder="web, mobile, design, etc.">
+                            </div>
+                            
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn-secondary" onclick="closeProjectModal()">Cancel</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <span id="project-submit-text">Add Project</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
                 <!-- Other Views -->
                 <div class="view-container" id="users-view">
                     <h2>User Management</h2>
@@ -565,5 +779,6 @@
     <script type="module" src="js/budget-management.js"></script>
     <script type="module" src="js/management.js"></script>
     <script type="module" src="js/ads-manager.js"></script>
+    <script type="module" src="js/projects-management.js"></script>
 </body>
 </html>
