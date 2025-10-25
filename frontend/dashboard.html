@@ -727,6 +727,360 @@
                     </div>
                 </div>
                 
+                <!-- Project Detail View -->
+                <div class="view-container" id="project-detail-view">
+                    <div class="project-detail-header">
+                        <button class="btn btn-secondary back-to-projects" onclick="backToProjects()">
+                            <i class="fas fa-arrow-left"></i> Back to Projects
+                        </button>
+                        <div class="project-detail-title">
+                            <h2 id="project-detail-name">Project Name</h2>
+                            <span class="project-detail-client" id="project-detail-client">Client Name</span>
+                        </div>
+                        <div class="project-detail-actions">
+                            <button class="btn btn-secondary" onclick="editProjectSettings()" title="Project Settings">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                            <button class="btn btn-primary" onclick="editCurrentProject()" title="Edit Project">
+                                <i class="fas fa-edit"></i> Edit Project
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="project-detail-content" id="project-detail-content">
+                        <div class="project-detail-grid">
+                            <!-- Project Info Panel -->
+                            <div class="project-panel project-info-panel">
+                                <div class="panel-header">
+                                    <h3><i class="fas fa-info-circle"></i> Project Information</h3>
+                                </div>
+                                <div class="panel-content">
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <label>Status</label>
+                                            <span class="project-status-badge" id="detail-status">Active</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Priority</label>
+                                            <span class="project-priority-badge" id="detail-priority">Medium</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Progress</label>
+                                            <div class="progress-container">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" id="detail-progress-fill"></div>
+                                                </div>
+                                                <span class="progress-text" id="detail-progress-text">0%</span>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Budget</label>
+                                            <span class="budget-value" id="detail-budget">$0</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Start Date</label>
+                                            <span id="detail-start-date">-</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Due Date</label>
+                                            <span id="detail-due-date">-</span>
+                                        </div>
+                                    </div>
+                                    <div class="project-description">
+                                        <label>Description</label>
+                                        <p id="detail-description">No description available.</p>
+                                    </div>
+                                    <div class="project-tags-container">
+                                        <label>Tags</label>
+                                        <div class="project-tags" id="detail-tags">
+                                            <!-- Tags will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Project Links Panel -->
+                            <div class="project-panel project-links-panel">
+                                <div class="panel-header">
+                                    <h3><i class="fas fa-link"></i> Project Links</h3>
+                                    <button class="btn btn-sm btn-primary" onclick="showAddLinkModal()">
+                                        <i class="fas fa-plus"></i> Add Link
+                                    </button>
+                                </div>
+                                <div class="panel-content">
+                                    <div class="links-container" id="project-links-container">
+                                        <!-- Links will be populated here -->
+                                        <div class="empty-state-small" id="empty-links-state">
+                                            <i class="fas fa-link"></i>
+                                            <p>No links added yet</p>
+                                            <button class="btn btn-sm btn-primary" onclick="showAddLinkModal()">Add First Link</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Project Files Panel -->
+                            <div class="project-panel project-files-panel">
+                                <div class="panel-header">
+                                    <h3><i class="fas fa-folder"></i> Project Files</h3>
+                                    <button class="btn btn-sm btn-primary" onclick="showUploadModal()">
+                                        <i class="fas fa-upload"></i> Upload File
+                                    </button>
+                                </div>
+                                <div class="panel-content">
+                                    <div class="files-container" id="project-files-container">
+                                        <!-- Files will be populated here -->
+                                        <div class="empty-state-small" id="empty-files-state">
+                                            <i class="fas fa-folder-open"></i>
+                                            <p>No files uploaded yet</p>
+                                            <button class="btn btn-sm btn-primary" onclick="showUploadModal()">Upload First File</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Project Notes Panel -->
+                            <div class="project-panel project-notes-panel">
+                                <div class="panel-header">
+                                    <h3><i class="fas fa-sticky-note"></i> Project Notes</h3>
+                                    <button class="btn btn-sm btn-primary" onclick="addNote()">
+                                        <i class="fas fa-plus"></i> Add Note
+                                    </button>
+                                </div>
+                                <div class="panel-content">
+                                    <div class="notes-container" id="project-notes-container">
+                                        <!-- Notes will be populated here -->
+                                        <div class="empty-state-small" id="empty-notes-state">
+                                            <i class="fas fa-sticky-note"></i>
+                                            <p>No notes added yet</p>
+                                            <button class="btn btn-sm btn-primary" onclick="addNote()">Add First Note</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Add Link Modal -->
+                <div class="modal" id="add-link-modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Add Project Link</h3>
+                            <button class="modal-close" onclick="closeAddLinkModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <form id="add-link-form" class="modal-form">
+                            <div class="form-group">
+                                <label for="link-title">Link Title *</label>
+                                <input type="text" id="link-title" required placeholder="e.g., Design Mockups">
+                            </div>
+                            <div class="form-group">
+                                <label for="link-url">URL *</label>
+                                <input type="url" id="link-url" required placeholder="https://example.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="link-description">Description</label>
+                                <textarea id="link-description" rows="3" placeholder="Brief description of this link"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="link-category">Category</label>
+                                <select id="link-category">
+                                    <option value="general">General</option>
+                                    <option value="design">Design</option>
+                                    <option value="development">Development</option>
+                                    <option value="documentation">Documentation</option>
+                                    <option value="client">Client Resources</option>
+                                    <option value="tools">Tools</option>
+                                </select>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn-secondary" onclick="closeAddLinkModal()">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Add Link</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Upload File Modal -->
+                <div class="modal" id="upload-file-modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Upload Project File</h3>
+                            <button class="modal-close" onclick="closeUploadModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <form id="upload-file-form" class="modal-form">
+                            <div class="file-upload-area" id="file-upload-area">
+                                <div class="upload-placeholder">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Drop files here or click to browse</p>
+                                    <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.zip,.txt">
+                                </div>
+                                <div class="uploaded-files-preview" id="uploaded-files-preview"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="file-category">Category</label>
+                                <select id="file-category">
+                                    <option value="document">Document</option>
+                                    <option value="invoice">Invoice</option>
+                                    <option value="contract">Contract</option>
+                                    <option value="design">Design</option>
+                                    <option value="image">Image</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="file-notes">Notes</label>
+                                <textarea id="file-notes" rows="3" placeholder="Add notes about these files"></textarea>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="upload-submit-btn">Upload Files</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Project Settings Modal -->
+                <div class="modal" id="project-settings-modal">
+                    <div class="modal-content project-settings-content">
+                        <div class="modal-header">
+                            <h3>Project Settings</h3>
+                            <button class="modal-close" onclick="closeProjectSettingsModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="settings-tabs">
+                                <button class="settings-tab active" data-tab="appearance" onclick="switchSettingsTab('appearance')">
+                                    <i class="fas fa-palette"></i> Appearance
+                                </button>
+                                <button class="settings-tab" data-tab="general" onclick="switchSettingsTab('general')">
+                                    <i class="fas fa-cog"></i> General
+                                </button>
+                            </div>
+                            
+                            <div class="settings-content">
+                                <!-- Appearance Settings -->
+                                <div class="settings-panel active" id="appearance-settings">
+                                    <h4>Customize Project Appearance</h4>
+                                    <div class="appearance-controls">
+                                        <div class="form-group">
+                                            <label for="background-type">Background Type</label>
+                                            <select id="background-type" onchange="updateBackgroundType()">
+                                                <option value="color">Solid Color</option>
+                                                <option value="gradient">Gradient</option>
+                                                <option value="image">Image</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="background-controls">
+                                            <!-- Color Background -->
+                                            <div class="bg-control" id="color-control">
+                                                <label for="bg-color">Background Color</label>
+                                                <div class="color-input-container">
+                                                    <input type="color" id="bg-color" value="#ffffff">
+                                                    <input type="text" id="bg-color-hex" value="#ffffff" placeholder="#ffffff">
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Gradient Background -->
+                                            <div class="bg-control" id="gradient-control" style="display: none;">
+                                                <label>Gradient Colors</label>
+                                                <div class="gradient-controls">
+                                                    <input type="color" id="gradient-color1" value="#6366f1">
+                                                    <input type="color" id="gradient-color2" value="#8b5cf6">
+                                                    <select id="gradient-direction">
+                                                        <option value="to right">Left to Right</option>
+                                                        <option value="to bottom">Top to Bottom</option>
+                                                        <option value="45deg">Diagonal</option>
+                                                        <option value="to bottom right">Top-Left to Bottom-Right</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Image Background -->
+                                            <div class="bg-control" id="image-control" style="display: none;">
+                                                <label for="bg-image">Background Image</label>
+                                                <input type="file" id="bg-image" accept="image/*">
+                                                <div class="image-options">
+                                                    <select id="bg-image-size">
+                                                        <option value="cover">Cover</option>
+                                                        <option value="contain">Contain</option>
+                                                        <option value="auto">Original Size</option>
+                                                    </select>
+                                                    <select id="bg-image-position">
+                                                        <option value="center">Center</option>
+                                                        <option value="top">Top</option>
+                                                        <option value="bottom">Bottom</option>
+                                                        <option value="left">Left</option>
+                                                        <option value="right">Right</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="text-color">Text Color</label>
+                                            <div class="color-input-container">
+                                                <input type="color" id="text-color" value="#1e293b">
+                                                <input type="text" id="text-color-hex" value="#1e293b" placeholder="#1e293b">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="panel-opacity">Panel Opacity</label>
+                                            <input type="range" id="panel-opacity" min="0.1" max="1" step="0.1" value="1">
+                                            <span id="opacity-value">100%</span>
+                                        </div>
+                                        
+                                        <div class="preview-section">
+                                            <label>Preview</label>
+                                            <div class="appearance-preview" id="appearance-preview">
+                                                <div class="preview-panel">
+                                                    <h4>Sample Panel</h4>
+                                                    <p>This is how your project page will look with the selected appearance settings.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- General Settings -->
+                                <div class="settings-panel" id="general-settings">
+                                    <h4>General Project Settings</h4>
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" id="show-progress-on-page"> 
+                                            Show progress bar on project page
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" id="auto-save-notes"> 
+                                            Auto-save notes as you type
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" id="enable-notifications"> 
+                                            Enable deadline notifications
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-secondary" onclick="resetAppearance()">Reset to Default</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeProjectSettingsModal()">Cancel</button>
+                            <button type="button" class="btn btn-primary" onclick="saveProjectSettings()">Save Settings</button>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Other Views -->
                 <div class="view-container" id="users-view">
                     <h2>User Management</h2>
