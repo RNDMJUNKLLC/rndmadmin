@@ -496,7 +496,10 @@ class ProjectsManager {
         this.resetProjectForm();
         document.getElementById('project-modal-title').textContent = 'Add New Project';
         document.getElementById('project-submit-text').textContent = 'Add Project';
-        document.getElementById('project-modal').style.display = 'flex';
+        const modal = document.getElementById('project-modal');
+        if (modal) {
+            modal.classList.add('show');
+        }
     }
 
     editProject(projectId) {
@@ -507,7 +510,10 @@ class ProjectsManager {
         this.populateProjectForm(project);
         document.getElementById('project-modal-title').textContent = 'Edit Project';
         document.getElementById('project-submit-text').textContent = 'Update Project';
-        document.getElementById('project-modal').style.display = 'flex';
+        const modal = document.getElementById('project-modal');
+        if (modal) {
+            modal.classList.add('show');
+        }
     }
 
     duplicateProject(projectId) {
@@ -544,7 +550,10 @@ class ProjectsManager {
     }
 
     closeProjectModal() {
-        document.getElementById('project-modal').style.display = 'none';
+        const modal = document.getElementById('project-modal');
+        if (modal) {
+            modal.classList.remove('show');
+        }
         this.currentProject = null;
     }
 
@@ -1123,14 +1132,20 @@ window.editCurrentProject = function() {
 };
 
 window.editProjectSettings = function() {
-    document.getElementById('project-settings-modal').style.display = 'flex';
-    if (window.projectsManager && window.projectsManager.currentProject) {
-        populateProjectSettings(window.projectsManager.currentProject);
+    const modal = document.getElementById('project-settings-modal');
+    if (modal) {
+        modal.classList.add('show');
+        if (window.projectsManager && window.projectsManager.currentProject) {
+            populateProjectSettings(window.projectsManager.currentProject);
+        }
     }
 };
 
 window.closeProjectSettingsModal = function() {
-    document.getElementById('project-settings-modal').style.display = 'none';
+    const modal = document.getElementById('project-settings-modal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
 };
 
 window.switchSettingsTab = function(tabName) {
@@ -1240,14 +1255,14 @@ window.saveProjectSettings = function() {
                     window.projectsManager.saveProjectAppearance(settings);
                 };
                 reader.readAsDataURL(fileInput.files[0]);
-                closeProjectSettingsModal();
+                window.closeProjectSettingsModal();
                 return;
             }
             break;
     }
     
     window.projectsManager.saveProjectAppearance(settings);
-    closeProjectSettingsModal();
+    window.closeProjectSettingsModal();
 };
 
 window.resetAppearance = function() {
@@ -1261,23 +1276,44 @@ window.resetAppearance = function() {
 
 // Link management functions
 window.showAddLinkModal = function() {
-    document.getElementById('add-link-modal').style.display = 'flex';
-    document.getElementById('add-link-form').reset();
+    const modal = document.getElementById('add-link-modal');
+    const form = document.getElementById('add-link-form');
+    if (modal) {
+        modal.classList.add('show');
+        if (form) {
+            form.reset();
+        }
+    }
 };
 
 window.closeAddLinkModal = function() {
-    document.getElementById('add-link-modal').style.display = 'none';
+    const modal = document.getElementById('add-link-modal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
 };
 
 // File upload functions  
 window.showUploadModal = function() {
-    document.getElementById('upload-file-modal').style.display = 'flex';
-    document.getElementById('upload-file-form').reset();
-    document.getElementById('uploaded-files-preview').innerHTML = '';
+    const modal = document.getElementById('upload-file-modal');
+    const form = document.getElementById('upload-file-form');
+    const preview = document.getElementById('uploaded-files-preview');
+    if (modal) {
+        modal.classList.add('show');
+        if (form) {
+            form.reset();
+        }
+        if (preview) {
+            preview.innerHTML = '';
+        }
+    }
 };
 
 window.closeUploadModal = function() {
-    document.getElementById('upload-file-modal').style.display = 'none';
+    const modal = document.getElementById('upload-file-modal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
 };
 
 // Notes functions
@@ -1403,7 +1439,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (files.length > 0 && window.projectsManager) {
                 window.projectsManager.addProjectFiles(files, category, notes);
-                closeUploadModal();
+                window.closeUploadModal();
             }
         });
     }
@@ -1421,7 +1457,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (window.projectsManager) {
                 window.projectsManager.addProjectLink(linkData);
-                closeAddLinkModal();
+                window.closeAddLinkModal();
             }
         });
     }
@@ -1465,6 +1501,17 @@ window.removeFile = function(fileName) {
     fileInput.files = dt.files;
     handleFileSelection();
 };
+
+// Keyboard event handling
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        // Close any open modals
+        const modals = document.querySelectorAll('.modal.show');
+        modals.forEach(modal => {
+            modal.classList.remove('show');
+        });
+    }
+});
 
 // Initialize projects manager when the projects view is loaded
 document.addEventListener('DOMContentLoaded', function() {

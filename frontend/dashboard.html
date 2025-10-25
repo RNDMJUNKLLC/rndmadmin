@@ -638,7 +638,7 @@
                 </div>
                 
                 <!-- Project Modal -->
-                <div class="modal" id="project-modal">
+                <div class="modal" id="project-modal" onclick="if(event.target === this) closeProjectModal()">
                     <div class="modal-content project-modal-content">
                         <div class="modal-header">
                             <h3 id="project-modal-title">Add New Project</h3>
@@ -863,7 +863,7 @@
                 </div>
                 
                 <!-- Add Link Modal -->
-                <div class="modal" id="add-link-modal">
+                <div class="modal" id="add-link-modal" onclick="if(event.target === this) closeAddLinkModal()">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h3>Add Project Link</h3>
@@ -904,7 +904,7 @@
                 </div>
                 
                 <!-- Upload File Modal -->
-                <div class="modal" id="upload-file-modal">
+                <div class="modal" id="upload-file-modal" onclick="if(event.target === this) closeUploadModal()">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h3>Upload Project File</h3>
@@ -945,7 +945,7 @@
                 </div>
                 
                 <!-- Project Settings Modal -->
-                <div class="modal" id="project-settings-modal">
+                <div class="modal" id="project-settings-modal" onclick="if(event.target === this) closeProjectSettingsModal()">
                     <div class="modal-content project-settings-content">
                         <div class="modal-header">
                             <h3>Project Settings</h3>

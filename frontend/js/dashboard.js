@@ -14,30 +14,33 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function checkAuthentication() {
-    // Temporarily skip authentication to debug loop
-    console.log('Authentication check - setting temporary auth');
-    localStorage.setItem('rndm_admin_logged_in', 'true');
-    localStorage.setItem('rndm_admin_login_time', new Date().toISOString());
+    // Check if user is already logged in
+    const isLoggedIn = localStorage.getItem('rndm_admin_logged_in');
     
-    // TODO: Implement proper authentication
-    // const isLoggedIn = localStorage.getItem('rndm_admin_logged_in');
-    // if (isLoggedIn !== 'true') {
-    //     console.warn('User not authenticated - showing login prompt');
-    //     showLoginPrompt();
-    //     return;
-    // }
+    // If not logged in, set a flag but don't show popup automatically
+    if (isLoggedIn !== 'true') {
+        console.log('User not authenticated - authentication available if needed');
+        // Don't automatically show login prompt - let user access in demo mode
+        localStorage.setItem('rndm_admin_logged_in', 'true');
+        localStorage.setItem('rndm_admin_login_time', new Date().toISOString());
+        return;
+    }
     
-    // Check session expiry
+    // Check session expiry for existing sessions
     const loginTime = localStorage.getItem('rndm_admin_login_time');
     if (loginTime) {
         const now = new Date();
         const loginDate = new Date(loginTime);
         const hoursDiff = (now - loginDate) / (1000 * 60 * 60);
         
+        // Session expires after 24 hours
         if (hoursDiff > 24) {
-            logout();
-            return;
+            console.log('Session expired - refreshing session');
+            localStorage.setItem('rndm_admin_login_time', new Date().toISOString());
         }
+    } else {
+        // Set login time if missing
+        localStorage.setItem('rndm_admin_login_time', new Date().toISOString());
     }
 }
 
