@@ -31,6 +31,14 @@
 - Backup and restore functionality
 - Settings management
 
+### 📈 Google Ads & AdSense Integration
+- Track Google Ads spending and performance
+- Monitor AdSense revenue and metrics
+- Manual Firebase-based configuration
+- Real-time dashboard metrics
+- 30-day performance overview
+- See [MANUAL_SETUP.md](MANUAL_SETUP.md) for configuration
+
 ### 🎨 Modern UI/UX
 - Clean, professional design
 - Animated transitions
@@ -140,6 +148,12 @@ For development purposes, you can login with empty credentials:
 - `npm run dev` - Start development server with hot reload
 - `npm run backend:dev` - Start backend only in development
 - `npm run frontend:dev` - Start frontend only in development
+
+## Documentation
+
+- **[MANUAL_SETUP.md](MANUAL_SETUP.md)** - Complete guide for manually setting up Google Ads & AdSense integration via Firebase
+- **[GOOGLE_ADS_GUIDE.md](GOOGLE_ADS_GUIDE.md)** - Overview of Google Ads and AdSense features, API integration options, and troubleshooting
+- **[FIREBASE_RULES_UPDATE.md](FIREBASE_RULES_UPDATE.md)** - Firebase Security Rules configuration
 
 ## Next Steps
 

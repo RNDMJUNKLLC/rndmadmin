@@ -138,12 +138,12 @@
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-icon">
-                                <i class="fas fa-users"></i>
+                                <i class="fas fa-envelope"></i>
                             </div>
                             <div class="stat-info">
-                                <h3>1,247</h3>
-                                <p>Total Users</p>
-                                <span class="stat-change positive">+12%</span>
+                                <h3 id="overview-total-leads">0</h3>
+                                <p>Total Leads</p>
+                                <span class="stat-change neutral" id="overview-leads-change">-</span>
                             </div>
                         </div>
                         
@@ -152,31 +152,31 @@
                                 <i class="fas fa-chart-line"></i>
                             </div>
                             <div class="stat-info">
-                                <h3>$24,580</h3>
-                                <p>Revenue</p>
-                                <span class="stat-change positive">+8.2%</span>
+                                <h3 id="overview-revenue">$0</h3>
+                                <p>Total Revenue</p>
+                                <span class="stat-change neutral" id="overview-revenue-change">-</span>
                             </div>
                         </div>
                         
                         <div class="stat-card">
                             <div class="stat-icon">
-                                <i class="fas fa-shopping-cart"></i>
+                                <i class="fas fa-dollar-sign"></i>
                             </div>
                             <div class="stat-info">
-                                <h3>892</h3>
-                                <p>Orders</p>
-                                <span class="stat-change negative">-3.1%</span>
+                                <h3 id="overview-expenses">$0</h3>
+                                <p>Total Expenses</p>
+                                <span class="stat-change neutral" id="overview-expenses-change">-</span>
                             </div>
                         </div>
                         
                         <div class="stat-card">
                             <div class="stat-icon">
-                                <i class="fas fa-server"></i>
+                                <i class="fas fa-hand-holding-usd"></i>
                             </div>
                             <div class="stat-info">
-                                <h3>99.9%</h3>
-                                <p>Uptime</p>
-                                <span class="stat-change neutral">+0.1%</span>
+                                <h3 id="overview-profit">$0</h3>
+                                <p>Net Profit</p>
+                                <span class="stat-change neutral" id="overview-profit-change">-</span>
                             </div>
                         </div>
                     </div>
@@ -189,32 +189,10 @@
                                     <i class="fas fa-ellipsis-v"></i>
                                 </button>
                             </div>
-                            <div class="activity-list">
+                            <div class="activity-list" id="activity-list">
                                 <div class="activity-item">
-                                    <div class="activity-icon">
-                                        <i class="fas fa-user-plus"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <p>New user registered</p>
-                                        <span class="activity-time">2 minutes ago</span>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon">
-                                        <i class="fas fa-shopping-cart"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <p>Order #1247 completed</p>
-                                        <span class="activity-time">15 minutes ago</span>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon">
-                                        <i class="fas fa-cog"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <p>System settings updated</p>
-                                        <span class="activity-time">1 hour ago</span>
+                                    <div class="activity-content" style="text-align: center; color: #999; padding: 20px;">
+                                        <p>No recent activity</p>
                                     </div>
                                 </div>
                             </div>
@@ -469,21 +447,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <div class="ads-setup-notice">
-                        <div class="notice-card">
-                            <h4>⚡ Setup Required</h4>
-                            <p>To display real Google Ads and AdSense data, you'll need to:</p>
-                            <ul>
-                                <li>Connect your Google Ads account via API</li>
-                                <li>Link your AdSense account</li>
-                                <li>Configure authentication credentials</li>
-                            </ul>
-                            <button class="btn btn-primary" onclick="showAdsSetup()">
-                                Setup Integration
-                            </button>
                         </div>
                     </div>
                 </div>

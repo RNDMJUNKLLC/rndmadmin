@@ -198,34 +198,66 @@ function loadDashboardData() {
     updateSystemStatus();
 }
 
-function updateStats() {
-    // This would typically fetch real data from your API
-    const stats = {
-        users: { value: 1247, change: 12, trend: 'positive' },
-        revenue: { value: '$24,580', change: 8.2, trend: 'positive' },
-        orders: { value: 892, change: -3.1, trend: 'negative' },
-        uptime: { value: '99.9%', change: 0.1, trend: 'neutral' }
-    };
-    
-    // Update stat cards with animation
-    Object.keys(stats).forEach(key => {
-        const stat = stats[key];
-        // Add animation logic here if needed
-    });
+async function updateStats() {
+    // Load real statistics from Firebase
+    try {
+        // This will be populated by the firebase-rest module
+        // For now, stats remain at 0 until data is available
+        const stats = {
+            leads: { value: 0, change: 0, trend: 'neutral' },
+            revenue: { value: 0, change: 0, trend: 'neutral' },
+            expenses: { value: 0, change: 0, trend: 'neutral' },
+            profit: { value: 0, change: 0, trend: 'neutral' }
+        };
+        
+        // Update overview stat cards
+        updateStatElement('overview-total-leads', stats.leads.value);
+        updateStatElement('overview-revenue', `$${stats.revenue.value.toLocaleString()}`);
+        updateStatElement('overview-expenses', `$${stats.expenses.value.toLocaleString()}`);
+        updateStatElement('overview-profit', `$${stats.profit.value.toLocaleString()}`);
+        
+        // Update change indicators
+        updateChangeElement('overview-leads-change', stats.leads.change, stats.leads.trend);
+        updateChangeElement('overview-revenue-change', stats.revenue.change, stats.revenue.trend);
+        updateChangeElement('overview-expenses-change', stats.expenses.change, stats.expenses.trend);
+        updateChangeElement('overview-profit-change', stats.profit.change, stats.profit.trend);
+    } catch (error) {
+        console.error('Error loading dashboard stats:', error);
+    }
 }
 
-function updateRecentActivity() {
-    // This would typically fetch real activity data
-    const activities = [
-        { icon: 'fa-user-plus', text: 'New user registered', time: '2 minutes ago' },
-        { icon: 'fa-shopping-cart', text: 'Order #1247 completed', time: '15 minutes ago' },
-        { icon: 'fa-cog', text: 'System settings updated', time: '1 hour ago' }
-    ];
-    
-    // Update activity list
-    const activityList = document.querySelector('.activity-list');
-    if (activityList) {
-        // Update with real data
+function updateStatElement(id, value) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.textContent = value;
+    }
+}
+
+function updateChangeElement(id, change, trend) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.textContent = change ? `${change > 0 ? '+' : ''}${change}%` : '-';
+        element.className = `stat-change ${trend}`;
+    }
+}
+
+async function updateRecentActivity() {
+    // Load real activity data from Firebase
+    try {
+        const activityList = document.getElementById('activity-list');
+        if (!activityList) return;
+        
+        // This will be populated by actual events from Firebase
+        // For now, show empty state
+        activityList.innerHTML = `
+            <div class="activity-item">
+                <div class="activity-content" style="text-align: center; color: #999; padding: 20px;">
+                    <p>No recent activity</p>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error loading recent activity:', error);
     }
 }
 
@@ -442,22 +474,22 @@ function createEmailForm() {
 }
 
 function showNotifications() {
-    const notifications = [
-        { type: 'info', message: 'System maintenance scheduled for tonight', time: '10 minutes ago' },
-        { type: 'success', message: 'Backup completed successfully', time: '1 hour ago' },
-        { type: 'warning', message: 'High CPU usage detected', time: '2 hours ago' }
-    ];
+    // Load real notifications from Firebase
+    const notifications = [];
     
     const content = `
         <div class="notifications-list">
-            ${notifications.map(notif => `
-                <div class="notification-item ${notif.type}">
-                    <div class="notification-content">
-                        <p>${notif.message}</p>
-                        <span class="notification-time">${notif.time}</span>
+            ${notifications.length === 0 ? 
+                '<p style="text-align: center; color: #999; padding: 20px;">No notifications</p>' :
+                notifications.map(notif => `
+                    <div class="notification-item ${notif.type}">
+                        <div class="notification-content">
+                            <p>${notif.message}</p>
+                            <span class="notification-time">${notif.time}</span>
+                        </div>
                     </div>
-                </div>
-            `).join('')}
+                `).join('')
+            }
         </div>
     `;
     
