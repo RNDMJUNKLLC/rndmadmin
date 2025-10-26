@@ -496,10 +496,7 @@ class ProjectsManager {
         this.resetProjectForm();
         document.getElementById('project-modal-title').textContent = 'Add New Project';
         document.getElementById('project-submit-text').textContent = 'Add Project';
-        const modal = document.getElementById('project-modal');
-        if (modal) {
-            modal.classList.add('show');
-        }
+        showModal('project-modal');
     }
 
     editProject(projectId) {
@@ -510,10 +507,7 @@ class ProjectsManager {
         this.populateProjectForm(project);
         document.getElementById('project-modal-title').textContent = 'Edit Project';
         document.getElementById('project-submit-text').textContent = 'Update Project';
-        const modal = document.getElementById('project-modal');
-        if (modal) {
-            modal.classList.add('show');
-        }
+        showModal('project-modal');
     }
 
     duplicateProject(projectId) {
@@ -550,10 +544,7 @@ class ProjectsManager {
     }
 
     closeProjectModal() {
-        const modal = document.getElementById('project-modal');
-        if (modal) {
-            modal.classList.remove('show');
-        }
+        hideModal('project-modal');
         this.currentProject = null;
     }
 
@@ -1132,20 +1123,17 @@ window.editCurrentProject = function() {
 };
 
 window.editProjectSettings = function() {
-    const modal = document.getElementById('project-settings-modal');
-    if (modal) {
-        modal.classList.add('show');
-        if (window.projectsManager && window.projectsManager.currentProject) {
-            populateProjectSettings(window.projectsManager.currentProject);
-        }
+    console.log('editProjectSettings called - this should only happen when user clicks the settings button');
+    console.trace('Call stack:'); // This will show us what called this function
+    showModal('project-settings-modal');
+    if (window.projectsManager && window.projectsManager.currentProject) {
+        populateProjectSettings(window.projectsManager.currentProject);
     }
 };
 
 window.closeProjectSettingsModal = function() {
-    const modal = document.getElementById('project-settings-modal');
-    if (modal) {
-        modal.classList.remove('show');
-    }
+    console.log('closeProjectSettingsModal called');
+    hideModal('project-settings-modal');
 };
 
 window.switchSettingsTab = function(tabName) {
@@ -1266,7 +1254,11 @@ window.saveProjectSettings = function() {
 };
 
 window.resetAppearance = function() {
-    if (!window.projectsManager || !window.projectsManager.currentProject) return;
+    console.log('resetAppearance called');
+    if (!window.projectsManager || !window.projectsManager.currentProject) {
+        console.log('No project manager or current project');
+        return;
+    }
     
     window.projectsManager.currentProject.appearance = {};
     window.projectsManager.updateProject(window.projectsManager.currentProject);
@@ -1276,44 +1268,32 @@ window.resetAppearance = function() {
 
 // Link management functions
 window.showAddLinkModal = function() {
-    const modal = document.getElementById('add-link-modal');
+    showModal('add-link-modal');
     const form = document.getElementById('add-link-form');
-    if (modal) {
-        modal.classList.add('show');
-        if (form) {
-            form.reset();
-        }
+    if (form) {
+        form.reset();
     }
 };
 
 window.closeAddLinkModal = function() {
-    const modal = document.getElementById('add-link-modal');
-    if (modal) {
-        modal.classList.remove('show');
-    }
+    hideModal('add-link-modal');
 };
 
 // File upload functions  
 window.showUploadModal = function() {
-    const modal = document.getElementById('upload-file-modal');
+    showModal('upload-file-modal');
     const form = document.getElementById('upload-file-form');
     const preview = document.getElementById('uploaded-files-preview');
-    if (modal) {
-        modal.classList.add('show');
-        if (form) {
-            form.reset();
-        }
-        if (preview) {
-            preview.innerHTML = '';
-        }
+    if (form) {
+        form.reset();
+    }
+    if (preview) {
+        preview.innerHTML = '';
     }
 };
 
 window.closeUploadModal = function() {
-    const modal = document.getElementById('upload-file-modal');
-    if (modal) {
-        modal.classList.remove('show');
-    }
+    hideModal('upload-file-modal');
 };
 
 // Notes functions
@@ -1513,8 +1493,46 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+// Modal management functions
+function showModal(modalId) {
+    console.log(`Attempting to show modal: ${modalId}`);
+    hideAllModals(); // Hide all other modals first
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('show');
+        modal.style.display = 'flex';
+        console.log(`Modal ${modalId} shown`);
+    } else {
+        console.error(`Modal ${modalId} not found`);
+    }
+}
+
+function hideModal(modalId) {
+    console.log(`Attempting to hide modal: ${modalId}`);
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+        console.log(`Modal ${modalId} hidden`);
+    } else {
+        console.error(`Modal ${modalId} not found`);
+    }
+}
+
+// Function to ensure all modals are hidden
+function hideAllModals() {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.classList.remove('show');
+        modal.style.display = 'none'; // Force hide with inline style as backup
+    });
+}
+
 // Initialize projects manager when the projects view is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    // Force hide all modals on page load
+    hideAllModals();
+    
     const projectsView = document.getElementById('projects-view');
     if (projectsView) {
         window.projectsManager = new ProjectsManager();
