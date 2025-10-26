@@ -1306,6 +1306,7 @@ window.addNote = function() {
 
 // Helper functions
 function populateProjectSettings(project) {
+    console.log('populateProjectSettings called for project:', project?.name);
     const settings = project.appearance || {};
     
     // Appearance settings
@@ -1521,8 +1522,11 @@ function hideModal(modalId) {
 
 // Function to ensure all modals are hidden
 function hideAllModals() {
+    console.log('hideAllModals called');
     const modals = document.querySelectorAll('.modal');
+    console.log(`Found ${modals.length} modals to hide`);
     modals.forEach(modal => {
+        console.log(`Hiding modal: ${modal.id}`);
         modal.classList.remove('show');
         modal.style.display = 'none'; // Force hide with inline style as backup
     });
@@ -1530,12 +1534,50 @@ function hideAllModals() {
 
 // Initialize projects manager when the projects view is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded - initializing projects manager');
+    
     // Force hide all modals on page load
     hideAllModals();
     
+    // Additional aggressive hide for project settings modal specifically
+    setTimeout(() => {
+        console.log('Running delayed modal hide check');
+        const settingsModal = document.getElementById('project-settings-modal');
+        if (settingsModal) {
+            console.log('Project settings modal found, force hiding');
+            settingsModal.classList.remove('show');
+            settingsModal.style.display = 'none';
+            settingsModal.style.visibility = 'hidden';
+            
+            // Set up mutation observer to catch unwanted modal shows
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        if (settingsModal.classList.contains('show')) {
+                            console.warn('DETECTED: Project settings modal was automatically shown!');
+                            console.trace('Auto-show detection stack trace');
+                            // Automatically hide it again
+                            settingsModal.classList.remove('show');
+                            settingsModal.style.display = 'none';
+                        }
+                    }
+                });
+            });
+            
+            observer.observe(settingsModal, {
+                attributes: true,
+                attributeFilter: ['class', 'style']
+            });
+        }
+        hideAllModals();
+    }, 100);
+    
     const projectsView = document.getElementById('projects-view');
     if (projectsView) {
+        console.log('Projects view found, creating ProjectsManager');
         window.projectsManager = new ProjectsManager();
+    } else {
+        console.log('Projects view not found');
     }
 });
 
