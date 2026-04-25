@@ -3,7 +3,7 @@
  * Loaded as a module so it can import firebase-auth.js
  */
 
-import { signIn, waitForAuthReady, getAdminStatus } from './firebase-auth.js';
+import { signIn, logout } from './firebase-auth.js';
 
 const loginForm = document.getElementById('loginForm');
 const loginBtn = document.querySelector('.login-btn');
@@ -99,30 +99,12 @@ function friendlyError(err) {
   }
 }
 
-// Circuit breaker — if login auto-redirects too often in a short window,
-// it almost certainly means the dashboard guard is bouncing back. Stop
-// auto-redirecting and let the user act manually.
-function hitLoopGuard() {
-  try {
-    const now = Date.now();
-    const key = 'rndm_login_history';
-    const hist = JSON.parse(sessionStorage.getItem(key) || '[]')
-      .filter((t) => now - t < 30000);
-    hist.push(now);
-    sessionStorage.setItem(key, JSON.stringify(hist));
-    return hist.length > 3;
-  } catch (e) { return false; }
-}
-
-function clearLoopGuard() {
-  try { sessionStorage.removeItem('rndm_login_history'); } catch (e) {}
-}
-
 // Clear any stale legacy mock-auth flags that could confuse other code paths.
 try {
   localStorage.removeItem('rndm_admin_logged_in');
   localStorage.removeItem('rndm_admin_user');
   sessionStorage.removeItem('rndm_boot_history');
+  sessionStorage.removeItem('rndm_login_history');
 } catch (e) { /* ignore */ }
 
 // Surface ?error=... from the URL so the user knows why they're here.
@@ -143,23 +125,21 @@ try {
   } catch (e) { /* ignore */ }
 })();
 
-// Auto-redirect if already signed in as admin (skipped when looping).
+// On every login page load, FORCE sign-out of any cached Firebase session.
+// The user explicitly wants to land on the login screen every time, with no
+// auto-redirect. This kills the loop where a cached (non-admin) session
+// keeps bouncing the user between login and dashboard.
 (async () => {
   try {
-    const user = await waitForAuthReady();
-    if (!user) return;
-    const { isAdmin } = await getAdminStatus();
-    if (!isAdmin) return;
-    if (hitLoopGuard()) {
-      showNotification('Detected redirect loop. Sign in manually below.', 'warning');
-      return;
-    }
-    showNotification('Already signed in. Redirecting...', 'info');
-    setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
-  } catch (err) {
-    console.warn('Auth ready check failed:', err);
+    await logout();
+  } catch (e) {
+    console.warn('Pre-login logout failed (probably no active session):', e);
   }
 })();
+
+// NOTE: auto-redirect-when-already-signed-in is intentionally removed.
+// Users must always submit credentials. Combined with browserSessionPersistence
+// in firebase-auth.js, this guarantees no unauthorized lingering access.
 
 if (loginForm) {
   loginForm.addEventListener('submit', async (e) => {
@@ -178,13 +158,11 @@ if (loginForm) {
       if (!isAdmin) {
         showNotification('This account does not have admin access.', 'error');
         // Sign them back out so the dashboard guard isn't satisfied
-        const { logout } = await import('./firebase-auth.js');
         await logout();
         setLoading(false);
         return;
       }
       showNotification('Login successful! Redirecting...', 'success');
-      clearLoopGuard();
       setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
     } catch (err) {
       console.error('Sign-in failed:', err);
