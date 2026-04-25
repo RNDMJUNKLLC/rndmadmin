@@ -118,6 +118,31 @@ function clearLoopGuard() {
   try { sessionStorage.removeItem('rndm_login_history'); } catch (e) {}
 }
 
+// Clear any stale legacy mock-auth flags that could confuse other code paths.
+try {
+  localStorage.removeItem('rndm_admin_logged_in');
+  localStorage.removeItem('rndm_admin_user');
+  sessionStorage.removeItem('rndm_boot_history');
+} catch (e) { /* ignore */ }
+
+// Surface ?error=... from the URL so the user knows why they're here.
+(function showUrlError() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const err = params.get('error');
+    if (!err) return;
+    const messages = {
+      'not-admin': 'This account does not have admin access. Ask an existing admin to grant the admin claim.',
+      'auth-error': 'Authentication failed. Please sign in again.',
+      'session-expired': 'Your session expired. Please sign in again.',
+    };
+    showNotification(messages[err] || 'Sign-in required.', 'error');
+    // Strip the param so a manual reload doesn't keep firing the toast.
+    const clean = window.location.pathname;
+    window.history.replaceState({}, '', clean);
+  } catch (e) { /* ignore */ }
+})();
+
 // Auto-redirect if already signed in as admin (skipped when looping).
 (async () => {
   try {

@@ -16,17 +16,29 @@ import {
 } from './firebase-auth.js';
 
 (async () => {
+  // Single-flight redirect — onAuthChanged can fire after we've already
+  // decided to redirect (e.g. our own logout()) and would otherwise cause
+  // a second navigation that resets the loop counter on the login page.
+  let redirected = false;
+  const goLogin = (suffix = '') => {
+    if (redirected) return;
+    redirected = true;
+    window.location.replace('login.html' + suffix);
+  };
+
   try {
     const user = await waitForAuthReady();
     if (!user) {
-      window.location.replace('login.html');
+      goLogin();
       return;
     }
     const status = await getAdminStatus();
     if (!status.isAdmin) {
       console.warn('User does not have admin claim — signing out.');
-      await logout();
-      window.location.replace('login.html?error=not-admin');
+      // Fire-and-forget logout; don't await — onAuthChanged below would
+      // otherwise race the explicit redirect.
+      logout().catch((e) => console.warn('logout failed:', e));
+      goLogin('?error=not-admin');
       return;
     }
 
@@ -46,14 +58,14 @@ import {
     const roleEl = document.querySelector('.sidebar-footer .user-role');
     if (roleEl) roleEl.textContent = user.email || 'Administrator';
 
-    // If the user signs out elsewhere, kick them out
+    // If the user signs out elsewhere, kick them out — but only once.
     onAuthChanged((u) => {
-      if (!u) window.location.replace('login.html');
+      if (!u) goLogin('?error=session-expired');
     });
 
     document.dispatchEvent(new CustomEvent('rndm:auth-ready', { detail: status }));
   } catch (err) {
     console.error('Auth guard failure:', err);
-    window.location.replace('login.html?error=auth-error');
+    goLogin('?error=auth-error');
   }
 })();

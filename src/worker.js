@@ -71,28 +71,50 @@ export default {
           Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
             response.headers.set(key, value);
           });
+          response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
           
           return response;
         }
       }
       
-      // Handle admin and login paths - serve dashboard directly
-      if (url.pathname === '/admin' || url.pathname === '/login') {
+      // /admin -> dashboard (auth-guard will bounce unauthed users to login)
+      if (url.pathname === '/admin') {
         const dashboardRequest = new Request(`${url.origin}/dashboard.html`);
         const dashboardResponse = await env.ASSETS.fetch(dashboardRequest);
-        
+
         if (dashboardResponse.status !== 404) {
           const response = new Response(dashboardResponse.body, {
             status: 200,
             statusText: 'OK',
             headers: dashboardResponse.headers
           });
-          
-          // Add security headers
           Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
             response.headers.set(key, value);
           });
-          
+          response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+          return response;
+        }
+      }
+
+      // /login -> serve login.html directly (NOT dashboard).
+      // Previously this served dashboard.html which immediately ran auth-guard
+      // and bounced users to login.html — a redirect loop when combined with
+      // the now-removed _redirects 301 that browsers cached.
+      if (url.pathname === '/login') {
+        const loginRequest = new Request(`${url.origin}/login.html`);
+        const loginResponse = await env.ASSETS.fetch(loginRequest);
+
+        if (loginResponse.status !== 404) {
+          const response = new Response(loginResponse.body, {
+            status: 200,
+            statusText: 'OK',
+            headers: loginResponse.headers
+          });
+          Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+            response.headers.set(key, value);
+          });
+          // Force revalidation so any stale 301 cached by browsers is replaced.
+          response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
           return response;
         }
       }
