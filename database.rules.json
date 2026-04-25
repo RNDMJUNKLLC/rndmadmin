@@ -1,0 +1,67 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "users": {
+      "$uid": {
+        ".read":  "auth != null && (auth.uid === $uid || auth.token.admin === true)",
+        ".write": "auth != null && (auth.uid === $uid || auth.token.admin === true)"
+      },
+      ".indexOn": ["dateJoined", "email"]
+    },
+
+    "contact-forms": {
+      ".read":  "auth != null && auth.token.admin === true",
+      ".indexOn": ["timestamp", "userId", "status"],
+      "$id": {
+        ".read":  "auth != null && (auth.token.admin === true || (data.child('userId').exists() && data.child('userId').val() === auth.uid))",
+        ".write": "auth != null && (auth.token.admin === true || (!data.exists() && (newData.child('userId').val() === auth.uid || !newData.child('userId').exists())))",
+        ".validate": "newData.hasChildren(['name','email','timestamp']) && newData.child('email').isString() && newData.child('timestamp').isNumber()"
+      }
+    },
+
+    "support-tickets": {
+      ".read":  "auth != null && auth.token.admin === true",
+      ".indexOn": ["timestamp", "userId", "status", "priority"],
+      "$id": {
+        ".read":  "auth != null && (auth.token.admin === true || (data.child('userId').exists() && data.child('userId').val() === auth.uid))",
+        ".write": "auth != null && (auth.token.admin === true || (!data.exists() && (newData.child('userId').val() === auth.uid || !newData.child('userId').exists())))",
+        ".validate": "newData.hasChildren(['name','email','timestamp']) && newData.child('email').isString() && newData.child('timestamp').isNumber()"
+      }
+    },
+
+    "applications": {
+      ".read":  "auth != null && auth.token.admin === true",
+      ".write": "auth != null && auth.token.admin === true",
+      ".indexOn": ["timestamp", "status"]
+    },
+
+    "revenue": {
+      ".read":  "auth != null && auth.token.admin === true",
+      ".write": "auth != null && auth.token.admin === true",
+      ".indexOn": ["date", "createdAt"]
+    },
+
+    "expenses": {
+      ".read":  "auth != null && auth.token.admin === true",
+      ".write": "auth != null && auth.token.admin === true",
+      ".indexOn": ["date", "createdAt"]
+    },
+
+    "google-ads-data": {
+      ".read":  "auth != null && auth.token.admin === true",
+      ".write": "auth != null && auth.token.admin === true"
+    },
+
+    "adsense-data": {
+      ".read":  "auth != null && auth.token.admin === true",
+      ".write": "auth != null && auth.token.admin === true"
+    },
+
+    "ads-config": {
+      ".read":  "auth != null && auth.token.admin === true",
+      ".write": "auth != null && auth.token.admin === true"
+    }
+  }
+}

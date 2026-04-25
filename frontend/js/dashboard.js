@@ -1,86 +1,31 @@
 // Dashboard functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Check authentication
-    checkAuthentication();
-    
-    // Initialize dashboard
-    initializeDashboard();
-    
-    // Set up event listeners
-    setupEventListeners();
-    
-    // Load initial data
-    loadDashboardData();
+    // Auth guard runs as a module and may not be ready yet.
+    // Wait for it before booting the dashboard.
+    if (window.__rndmAuth && window.__rndmAuth.isAdmin) {
+        bootDashboard();
+    } else {
+        document.addEventListener('rndm:auth-ready', bootDashboard, { once: true });
+        // Hard fallback — if guard never fires within 8s, send to login.
+        setTimeout(() => {
+            if (!window.__rndmAuth || !window.__rndmAuth.isAdmin) {
+                console.warn('Auth not ready — redirecting to login.');
+                window.location.replace('login.html');
+            }
+        }, 8000);
+    }
 });
 
+function bootDashboard() {
+    initializeDashboard();
+    setupEventListeners();
+    loadDashboardData();
+}
+
 function checkAuthentication() {
-    // Check if user is already logged in
-    const isLoggedIn = localStorage.getItem('rndm_admin_logged_in');
-    
-    // If not logged in, set a flag but don't show popup automatically
-    if (isLoggedIn !== 'true') {
-        console.log('User not authenticated - authentication available if needed');
-        // Don't automatically show login prompt - let user access in demo mode
-        localStorage.setItem('rndm_admin_logged_in', 'true');
-        localStorage.setItem('rndm_admin_login_time', new Date().toISOString());
-        return;
-    }
-    
-    // Check session expiry for existing sessions
-    const loginTime = localStorage.getItem('rndm_admin_login_time');
-    if (loginTime) {
-        const now = new Date();
-        const loginDate = new Date(loginTime);
-        const hoursDiff = (now - loginDate) / (1000 * 60 * 60);
-        
-        // Session expires after 24 hours
-        if (hoursDiff > 24) {
-            console.log('Session expired - refreshing session');
-            localStorage.setItem('rndm_admin_login_time', new Date().toISOString());
-        }
-    } else {
-        // Set login time if missing
-        localStorage.setItem('rndm_admin_login_time', new Date().toISOString());
-    }
+    // Auth is enforced by auth-guard.js; this is just a getter for legacy callers.
+    return window.__rndmAuth && window.__rndmAuth.isAdmin === true;
 }
-
-function showLoginPrompt() {
-    // Create a simple in-page login prompt to avoid redirect loops
-    const loginPrompt = document.createElement('div');
-    loginPrompt.id = 'login-prompt';
-    loginPrompt.innerHTML = `
-        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
-            <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 400px; text-align: center;">
-                <h2>Admin Access Required</h2>
-                <p>Please authenticate to access the admin dashboard.</p>
-                <button onclick="proceedWithoutAuth()" style="background: #3b82f6; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin: 8px;">
-                    Continue Anyway (Demo Mode)
-                </button>
-                <button onclick="goToLogin()" style="background: #6b7280; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin: 8px;">
-                    Go to Login
-                </button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(loginPrompt);
-}
-
-function proceedWithoutAuth() {
-    // Set temporary auth for demo purposes
-    localStorage.setItem('rndm_admin_logged_in', 'true');
-    localStorage.setItem('rndm_admin_login_time', new Date().toISOString());
-    document.getElementById('login-prompt')?.remove();
-    location.reload();
-}
-
-function goToLogin() {
-    // Only redirect if explicitly requested
-    window.location.href = 'login.html';
-}
-
-// Make functions globally accessible
-window.proceedWithoutAuth = proceedWithoutAuth;
-window.goToLogin = goToLogin;
 
 function initializeDashboard() {
     // Set up sidebar toggle
@@ -593,18 +538,14 @@ function getNotificationColor(type) {
 }
 
 function logout() {
-    // Clear session data
-    localStorage.removeItem('rndm_admin_logged_in');
-    localStorage.removeItem('rndm_admin_login_time');
-    localStorage.removeItem('rndm_admin_token');
-    
-    // Show logout message
-    showNotification('Logging out...', 'info');
-    
-    // Show login prompt instead of redirecting
-    setTimeout(() => {
-        showLoginPrompt();
-    }, 1000);
+    showNotification('Signing out...', 'info');
+    if (window.__rndmAuth && typeof window.__rndmAuth.logout === 'function') {
+        window.__rndmAuth.logout()
+            .catch((err) => console.error('Sign-out error:', err))
+            .finally(() => { window.location.replace('login.html'); });
+    } else {
+        window.location.replace('login.html');
+    }
 }
 
 // Export functions for use in other scripts

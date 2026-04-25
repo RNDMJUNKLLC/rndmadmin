@@ -5,6 +5,7 @@
  */
 
 import { firebaseConfig } from './firebase-config.js';
+import { getIdToken } from './firebase-auth.js';
 
 /**
  * Firebase REST API Service Class
@@ -28,12 +29,13 @@ class FirebaseRestService {
   }
 
   /**
-   * Build Firebase REST API URL
-   * Note: Requires Firebase Database Rules to allow public read access
-   * Or add ?auth=<database_secret> for authenticated access
+   * Build Firebase REST API URL with the current user's ID token appended.
+   * Requires the user to be signed in (auth-guard.js enforces this).
    */
-  buildURL(path) {
-    return `${this.databaseURL}/${path}.json`;
+  async buildURL(path) {
+    const token = await getIdToken().catch(() => null);
+    const base = `${this.databaseURL}/${path}.json`;
+    return token ? `${base}?auth=${encodeURIComponent(token)}` : base;
   }
 
   /**
@@ -41,7 +43,7 @@ class FirebaseRestService {
    */
   async getContactSubmissions(limit = 100) {
     try {
-      const url = this.buildURL('contact-forms');
+      const url = await this.buildURL('contact-forms');
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -78,7 +80,7 @@ class FirebaseRestService {
    */
   async updateContactSubmission(submissionId, updatedData) {
     try {
-      const url = this.buildURL(`contact-forms/${submissionId}`);
+      const url = await this.buildURL(`contact-forms/${submissionId}`);
       const response = await fetch(url, {
         method: 'PATCH',
         headers: {
@@ -106,7 +108,7 @@ class FirebaseRestService {
    */
   async deleteContactSubmission(submissionId) {
     try {
-      const url = this.buildURL(`contact-forms/${submissionId}`);
+      const url = await this.buildURL(`contact-forms/${submissionId}`);
       const response = await fetch(url, {
         method: 'DELETE'
       });
@@ -127,7 +129,7 @@ class FirebaseRestService {
    */
   async getAllUsers(limit = 100) {
     try {
-      const url = this.buildURL('users');
+      const url = await this.buildURL('users');
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -157,7 +159,7 @@ class FirebaseRestService {
    */
   async getSupportTickets(limit = 50) {
     try {
-      const url = this.buildURL('support-tickets');
+      const url = await this.buildURL('support-tickets');
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -187,7 +189,7 @@ class FirebaseRestService {
    */
   async getApplications(limit = 50) {
     try {
-      const url = this.buildURL('applications');
+      const url = await this.buildURL('applications');
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -321,7 +323,7 @@ class FirebaseRestService {
    */
   async getExpenses(limit = 100) {
     try {
-      const url = this.buildURL('expenses');
+      const url = await this.buildURL('expenses');
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -351,7 +353,7 @@ class FirebaseRestService {
    */
   async createExpense(expenseData) {
     try {
-      const url = this.buildURL('expenses');
+      const url = await this.buildURL('expenses');
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -380,7 +382,7 @@ class FirebaseRestService {
    */
   async createRevenue(revenueData) {
     try {
-      const url = this.buildURL('revenue');
+      const url = await this.buildURL('revenue');
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -409,7 +411,7 @@ class FirebaseRestService {
    */
   async getRevenue(limit = 100) {
     try {
-      const url = this.buildURL('revenue');
+      const url = await this.buildURL('revenue');
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -439,7 +441,7 @@ class FirebaseRestService {
    */
   async createUser(userData) {
     try {
-      const url = this.buildURL('users');
+      const url = await this.buildURL('users');
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -469,7 +471,7 @@ class FirebaseRestService {
    */
   async updateUser(userId, updatedData) {
     try {
-      const url = this.buildURL(`users/${userId}`);
+      const url = await this.buildURL(`users/${userId}`);
       const response = await fetch(url, {
         method: 'PATCH',
         headers: {
@@ -497,7 +499,7 @@ class FirebaseRestService {
    */
   async deleteUser(userId) {
     try {
-      const url = this.buildURL(`users/${userId}`);
+      const url = await this.buildURL(`users/${userId}`);
       const response = await fetch(url, {
         method: 'DELETE'
       });
@@ -518,7 +520,7 @@ class FirebaseRestService {
    */
   async getGoogleAdsData() {
     try {
-      const url = this.buildURL('google-ads-data');
+      const url = await this.buildURL('google-ads-data');
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -538,7 +540,7 @@ class FirebaseRestService {
    */
   async saveGoogleAdsData(adsData) {
     try {
-      const url = this.buildURL('google-ads-data');
+      const url = await this.buildURL('google-ads-data');
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -563,7 +565,7 @@ class FirebaseRestService {
    */
   async getAdSenseData() {
     try {
-      const url = this.buildURL('adsense-data');
+      const url = await this.buildURL('adsense-data');
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -583,7 +585,7 @@ class FirebaseRestService {
    */
   async saveAdSenseData(adsenseData) {
     try {
-      const url = this.buildURL('adsense-data');
+      const url = await this.buildURL('adsense-data');
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -608,7 +610,7 @@ class FirebaseRestService {
    */
   async saveAdsConfig(config) {
     try {
-      const url = this.buildURL('ads-config');
+      const url = await this.buildURL('ads-config');
       const response = await fetch(url, {
         method: 'PUT',
         headers: {

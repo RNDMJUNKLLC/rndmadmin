@@ -8,6 +8,10 @@ temp_reference/
 .env.local
 .env.production
 
+# Service account credentials — NEVER commit
+service-account.json
+*-firebase-adminsdk-*.json
+
 # Build outputs
 dist/
 build/

@@ -8,7 +8,10 @@
     "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
     "backend:dev": "nodemon backend/server.js",
     "frontend:dev": "live-server frontend --port=3001",
-    "install:all": "npm install && cd backend && npm install"
+    "install:all": "npm install && cd backend && npm install",
+    "admin:grant": "node scripts/set-admin-claim.js grant",
+    "admin:revoke": "node scripts/set-admin-claim.js revoke",
+    "migrate:legacy": "node scripts/migrate-legacy-paths.js"
   },
   "keywords": [
     "admin",
@@ -26,7 +29,8 @@
     "dotenv": "^16.3.1",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.0.3"
+    "mongoose": "^8.0.3",
+    "firebase-admin": "^12.1.0"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

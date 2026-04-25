@@ -1118,6 +1118,9 @@
     <!-- Mobile Overlay -->
     <div class="mobile-overlay" id="mobileOverlay"></div>
     
+    <!-- Auth guard — must run first; redirects to login if not signed in as admin -->
+    <script type="module" src="js/auth-guard.js"></script>
+
     <!-- Chart.js for Analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     
