@@ -59,52 +59,12 @@ export default {
     try {
       const url = new URL(request.url);
       
-      // Handle root path - serve dashboard directly (no redirect)
-      if (url.pathname === '/') {
-        const dashboardRequest = new Request(`${url.origin}/dashboard.html`);
-        const dashboardResponse = await env.ASSETS.fetch(dashboardRequest);
-        
-        if (dashboardResponse.status !== 404) {
-          const response = new Response(dashboardResponse.body, {
-            status: 200,
-            statusText: 'OK',
-            headers: dashboardResponse.headers
-          });
-          
-          // Add security headers
-          Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
-            response.headers.set(key, value);
-          });
-          response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-          
-          return response;
-        }
-      }
-      
-      // /admin -> dashboard (auth-guard will bounce unauthed users to login)
-      if (url.pathname === '/admin') {
-        const dashboardRequest = new Request(`${url.origin}/dashboard.html`);
-        const dashboardResponse = await env.ASSETS.fetch(dashboardRequest);
-
-        if (dashboardResponse.status !== 404) {
-          const response = new Response(dashboardResponse.body, {
-            status: 200,
-            statusText: 'OK',
-            headers: dashboardResponse.headers
-          });
-          Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
-            response.headers.set(key, value);
-          });
-          response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-          return response;
-        }
-      }
-
-      // /login -> serve login.html directly (NOT dashboard).
-      // Previously this served dashboard.html which immediately ran auth-guard
-      // and bounced users to login.html — a redirect loop when combined with
-      // the now-removed _redirects 301 that browsers cached.
-      if (url.pathname === '/login') {
+      // Always land on the login page for /, /admin, /login.
+      // The dashboard is only reachable by explicitly navigating to
+      // /dashboard.html (or /dashboard/*), which is gated by auth-guard.
+      // Combined with session-only auth persistence (firebase-auth.js),
+      // closing the tab/browser forces a fresh sign-in.
+      if (url.pathname === '/' || url.pathname === '/admin' || url.pathname === '/login') {
         const loginRequest = new Request(`${url.origin}/login.html`);
         const loginResponse = await env.ASSETS.fetch(loginRequest);
 
@@ -117,11 +77,12 @@ export default {
           Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
             response.headers.set(key, value);
           });
-          // Force revalidation so any stale 301 cached by browsers is replaced.
           response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
           return response;
         }
       }
+      
+
       
       // Block access to temp_reference files - return 404
       if (url.pathname.startsWith('/temp_reference/')) {

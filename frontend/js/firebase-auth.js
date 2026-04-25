@@ -15,7 +15,7 @@ import {
   onAuthStateChanged,
   signOut,
   setPersistence,
-  browserLocalPersistence,
+  browserSessionPersistence,
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { firebaseConfig } from './firebase-config.js';
 
@@ -23,8 +23,10 @@ import { firebaseConfig } from './firebase-config.js';
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// Make sure tokens survive a page reload
-setPersistence(auth, browserLocalPersistence).catch((err) =>
+// Session-only persistence — auth state lives only for the current tab.
+// Closing the tab/browser forces a fresh sign-in. Reloads within the tab
+// keep the user signed in so the app stays usable.
+setPersistence(auth, browserSessionPersistence).catch((err) =>
   console.warn('Failed to set auth persistence:', err)
 );
 
