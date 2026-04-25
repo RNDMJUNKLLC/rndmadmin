@@ -33,6 +33,10 @@ const SECURITY_HEADERS = {
       https://*.googleapis.com 
       https://api.googleads.com 
       https://www.googleadservices.com 
+      https://www.gstatic.com 
+      https://cdn.jsdelivr.net 
+      https://static.cloudflareinsights.com 
+      https://cloudflareinsights.com 
       wss://*.firebaseio.com;
     frame-src 'self' 
       https://*.firebaseapp.com 
