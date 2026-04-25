@@ -52,15 +52,12 @@
     </div>
 
     <script>
-        // Check if user is logged in and redirect accordingly
+        // Always send users to login — the login page itself will forward
+        // signed-in admins to the dashboard. This avoids relying on stale
+        // legacy localStorage flags that could trap users in a redirect.
         setTimeout(() => {
-            const isLoggedIn = localStorage.getItem('rndm_admin_logged_in');
-            if (isLoggedIn === 'true') {
-                window.location.href = 'dashboard.html';
-            } else {
-                window.location.href = 'login.html';
-            }
-        }, 1500);
+            window.location.replace('login.html');
+        }, 500);
     </script>
 </body>
 </html>

@@ -38,6 +38,7 @@ import {
       getIdToken,
       logout,
     };
+    window.__rndmAuthReady = true;
 
     // Update sidebar profile if present
     const nameEl = document.querySelector('.sidebar-footer .user-name');

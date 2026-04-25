@@ -99,16 +99,38 @@ function friendlyError(err) {
   }
 }
 
-// Auto-redirect if already signed in as admin
+// Circuit breaker — if login auto-redirects too often in a short window,
+// it almost certainly means the dashboard guard is bouncing back. Stop
+// auto-redirecting and let the user act manually.
+function hitLoopGuard() {
+  try {
+    const now = Date.now();
+    const key = 'rndm_login_history';
+    const hist = JSON.parse(sessionStorage.getItem(key) || '[]')
+      .filter((t) => now - t < 30000);
+    hist.push(now);
+    sessionStorage.setItem(key, JSON.stringify(hist));
+    return hist.length > 3;
+  } catch (e) { return false; }
+}
+
+function clearLoopGuard() {
+  try { sessionStorage.removeItem('rndm_login_history'); } catch (e) {}
+}
+
+// Auto-redirect if already signed in as admin (skipped when looping).
 (async () => {
   try {
     const user = await waitForAuthReady();
     if (!user) return;
     const { isAdmin } = await getAdminStatus();
-    if (isAdmin) {
-      showNotification('Already signed in. Redirecting...', 'info');
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
+    if (!isAdmin) return;
+    if (hitLoopGuard()) {
+      showNotification('Detected redirect loop. Sign in manually below.', 'warning');
+      return;
     }
+    showNotification('Already signed in. Redirecting...', 'info');
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
   } catch (err) {
     console.warn('Auth ready check failed:', err);
   }
@@ -137,6 +159,7 @@ if (loginForm) {
         return;
       }
       showNotification('Login successful! Redirecting...', 'success');
+      clearLoopGuard();
       setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
     } catch (err) {
       console.error('Sign-in failed:', err);

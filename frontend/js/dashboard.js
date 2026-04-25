@@ -1,20 +1,57 @@
 // Dashboard functionality
-document.addEventListener('DOMContentLoaded', function() {
-    // Auth guard runs as a module and may not be ready yet.
-    // Wait for it before booting the dashboard.
-    if (window.__rndmAuth && window.__rndmAuth.isAdmin) {
-        bootDashboard();
-    } else {
-        document.addEventListener('rndm:auth-ready', bootDashboard, { once: true });
-        // Hard fallback — if guard never fires within 8s, send to login.
-        setTimeout(() => {
-            if (!window.__rndmAuth || !window.__rndmAuth.isAdmin) {
-                console.warn('Auth not ready — redirecting to login.');
-                window.location.replace('login.html');
-            }
-        }, 8000);
+//
+// Boot sequence:
+//   1. auth-guard.js (module) verifies the user is signed in with admin claim
+//      and sets window.__rndmAuth + window.__rndmAuthReady.
+//   2. We wait for BOTH that flag and DOMContentLoaded before booting.
+//   3. Circuit breaker: if we've reloaded this page > 3 times in 30s, we stop
+//      and surface an error instead of redirecting again. Prevents auth
+//      loops from making the dashboard unusable.
+
+(function bootGuard() {
+    // Circuit breaker — detect runaway reload loops.
+    try {
+        const now = Date.now();
+        const key = 'rndm_boot_history';
+        const history = JSON.parse(sessionStorage.getItem(key) || '[]')
+            .filter((t) => now - t < 30000);
+        history.push(now);
+        sessionStorage.setItem(key, JSON.stringify(history));
+        if (history.length > 4) {
+            console.error('Detected dashboard reload loop — halting.');
+            sessionStorage.removeItem(key);
+            document.documentElement.innerHTML =
+                '<div style="font-family:Inter,sans-serif;padding:40px;max-width:560px;margin:60px auto;background:#fff;border-radius:12px;color:#111;"><h2>Auth loop detected</h2><p>The dashboard kept reloading. Sign out and try again.</p><p><button onclick="sessionStorage.clear();localStorage.clear();location.replace(\'login.html\')" style="background:#ef4444;color:#fff;border:0;padding:10px 18px;border-radius:6px;cursor:pointer;">Clear session &amp; go to login</button></p></div>';
+            return;
+        }
+    } catch (e) { /* ignore storage errors */ }
+
+    function whenAuthReady() {
+        if (window.__rndmAuthReady && window.__rndmAuth) return Promise.resolve(window.__rndmAuth);
+        return new Promise((resolve) => {
+            const onReady = () => resolve(window.__rndmAuth);
+            document.addEventListener('rndm:auth-ready', onReady, { once: true });
+            // Poll fallback in case the event already fired before we attached.
+            const poll = setInterval(() => {
+                if (window.__rndmAuthReady && window.__rndmAuth) {
+                    clearInterval(poll);
+                    document.removeEventListener('rndm:auth-ready', onReady);
+                    resolve(window.__rndmAuth);
+                }
+            }, 100);
+        });
     }
-});
+
+    function whenDomReady() {
+        if (document.readyState !== 'loading') return Promise.resolve();
+        return new Promise((r) => document.addEventListener('DOMContentLoaded', r, { once: true }));
+    }
+
+    Promise.all([whenAuthReady(), whenDomReady()]).then(([auth]) => {
+        if (!auth || !auth.isAdmin) return; // auth-guard.js will have redirected
+        bootDashboard();
+    });
+})();
 
 function bootDashboard() {
     initializeDashboard();
