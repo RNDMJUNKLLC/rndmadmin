@@ -23,7 +23,9 @@ import {
   const goLogin = (suffix = '') => {
     if (redirected) return;
     redirected = true;
-    window.location.replace('login.html' + suffix);
+    // Cache-bust to defeat any browser-cached 301 from the old _redirects.
+    const sep = suffix.includes('?') ? '&' : '?';
+    window.location.replace('login.html' + suffix + sep + 't=' + Date.now());
   };
 
   try {
